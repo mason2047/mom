@@ -1,6 +1,4 @@
-'use client'
-
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import NavBar from '@/components/layout/NavBar'
 
 /**
@@ -12,11 +10,9 @@ const SKILLS = ['母乳喂养指导', '产后康复', '新生儿洗澡', '月子
 const CERTS = ['高级母婴护理师', '催乳师证', '营养师证', '心理咨询师']
 
 export default function NannyDetailPage() {
-  const router = useRouter()
-
   return (
     <div className="flex flex-col min-h-screen bg-bg">
-      <NavBar title="月嫂详情" onBack={() => router.back()} />
+      <NavBar title="月嫂详情" backHref="/maternity" />
 
       <div className="flex-1 overflow-y-auto hide-scrollbar pb-24">
         {/* Profile */}
@@ -120,12 +116,12 @@ export default function NannyDetailPage() {
         <button className="flex-1 h-12 rounded-[12px] bg-[#fff0f4] border-[1.5px] border-rose text-[15px] font-semibold text-rose">
           &#128172; 在线沟通
         </button>
-        <button
-          onClick={() => router.push('/maternity/booking')}
-          className="flex-1 h-12 rounded-[12px] bg-gradient-to-br from-rose to-[#c04060] text-[15px] font-semibold text-white"
+        <Link
+          href="/maternity/booking"
+          className="flex-1 h-12 rounded-[12px] bg-gradient-to-br from-rose to-[#c04060] text-[15px] font-semibold text-white flex items-center justify-center"
         >
           立即预约
-        </button>
+        </Link>
       </div>
     </div>
   )

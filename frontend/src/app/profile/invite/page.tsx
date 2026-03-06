@@ -1,7 +1,3 @@
-'use client'
-
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import NavBar from '@/components/layout/NavBar'
 import Accordion from '@/components/ui/Accordion'
 
@@ -88,15 +84,13 @@ const RULES = [
 ]
 
 export default function InvitePage() {
-  const router = useRouter()
-
   return (
     <div className="flex flex-col min-h-screen bg-bg">
       <NavBar
         title="邀请有礼"
-        onBack={() => router.back()}
+        backHref="/profile"
         rightContent={<span className="text-[13px] text-white/70">规则</span>}
-        className="!bg-[#2d1654] !border-b-0 [&>div]:!text-white [&>button]:!bg-white/20 [&>button]:!text-white"
+        className="!bg-[#2d1654] !border-b-0 [&>div]:!text-white [&>a]:!bg-white/20 [&>a]:!text-white"
       />
 
       <div className="flex-1 overflow-y-auto hide-scrollbar pb-24">

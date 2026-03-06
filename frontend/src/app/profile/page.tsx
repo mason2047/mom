@@ -1,8 +1,9 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import TabBar from '@/components/layout/TabBar'
-import ProfileMenuExtras, { SampleCountStat } from '@/components/business/ProfileMenuExtras'
+import ProfileMenuExtras from '@/components/business/ProfileMenuExtras'
+import InviteBanner from '@/components/business/InviteBanner'
 
 /**
  * 我的 Tab - 个人中心
@@ -23,6 +24,8 @@ const MENU_SECTIONS = [
     title: '生活服务',
     items: [
       { icon: '&#127968;', iconBg: 'icon-bg-purple', title: '月子规划', desc: '月子中心 / 月嫂预约', route: '/maternity' },
+      { icon: '&#127942;', iconBg: 'icon-bg-gold', title: '成就徽章', desc: '查看孕期成就进度', route: '/profile/achievements' },
+      { icon: '&#128722;', iconBg: 'icon-bg-gold', title: '幸孕币商城', desc: '兑换母婴好物', route: '/profile/coins' },
     ],
   },
   {
@@ -36,8 +39,6 @@ const MENU_SECTIONS = [
 ]
 
 export default function ProfilePage() {
-  const router = useRouter()
-
   return (
     <div className="flex flex-col min-h-screen bg-[#faf8f5]">
 
@@ -45,8 +46,10 @@ export default function ProfilePage() {
         {/* 用户信息头部 */}
         <div className="bg-gradient-to-br from-[#fef5ee] to-[#fce9d8] px-5 pt-5 pb-6">
           <div className="flex items-center gap-3.5">
-            <div className="w-[60px] h-[60px] rounded-full bg-gradient-to-br from-[#f5c4a8] to-[#e8a07a] border-[3px] border-white/80 flex items-center justify-center text-[30px] flex-shrink-0 shadow-[0_4px_16px_rgba(232,116,74,0.25)]">
+            <div className="w-[66px] h-[66px] rounded-full bg-gradient-to-br from-[#f0b429] via-[#ffd700] to-[#e8a020] p-[3px] flex-shrink-0 shadow-[0_4px_16px_rgba(232,116,74,0.25)]">
+            <div className="w-full h-full rounded-full bg-gradient-to-br from-[#f5c4a8] to-[#e8a07a] flex items-center justify-center text-[30px]">
               &#128118;
+            </div>
             </div>
             <div className="flex-1">
               <div className="text-xl font-bold text-[#2a1a0e] mb-1">小明妈妈</div>
@@ -63,16 +66,16 @@ export default function ProfilePage() {
               { num: '14+3', label: '当前孕周' },
               { num: '182', label: '距预产期' },
               { num: '1,280', label: '幸孕币' },
-            ].map((item, i) => (
+              { num: '3次', label: '产检次数' },
+            ].map((item, i, arr) => (
               <div
                 key={item.label}
-                className={`flex-1 flex flex-col items-center gap-0.5 border-r border-[rgba(232,116,74,0.15)]`}
+                className={`flex-1 flex flex-col items-center gap-0.5 ${i < arr.length - 1 ? 'border-r border-[rgba(232,116,74,0.15)]' : ''}`}
               >
                 <span className="text-xl font-extrabold text-primary">{item.num}</span>
                 <span className="text-[11px] text-[#9a7a65]">{item.label}</span>
               </div>
             ))}
-            <SampleCountStat />
           </div>
 
           {/* 孕周进度条 */}
@@ -89,7 +92,10 @@ export default function ProfilePage() {
         </div>
 
         {/* 会员权益菜单 */}
-        <ProfileMenuExtras onItemClick={(title) => router.push('/profile')} />
+        <ProfileMenuExtras />
+
+        {/* 邀请好友 Banner */}
+        <InviteBanner />
 
         {/* 菜单区域 */}
         {MENU_SECTIONS.map((section) => (
@@ -99,9 +105,9 @@ export default function ProfilePage() {
             </div>
             <div className="bg-white rounded-card overflow-hidden shadow-card-md">
               {section.items.map((item, i) => (
-                <button
+                <Link
                   key={item.title}
-                  onClick={() => router.push(item.route)}
+                  href={item.route}
                   className={`w-full flex items-center px-4 py-3.5 gap-3 text-left active:bg-[#faf7f3] transition-colors ${
                     i < section.items.length - 1 ? 'border-b border-border' : ''
                   }`}
@@ -112,6 +118,7 @@ export default function ProfilePage() {
                       item.iconBg === 'icon-bg-green' ? 'bg-green-50' :
                       item.iconBg === 'icon-bg-blue' ? 'bg-blue-50' :
                       item.iconBg === 'icon-bg-purple' ? 'bg-purple-50' :
+                      item.iconBg === 'icon-bg-gold' ? 'bg-gold-50' :
                       'bg-[#f4f4f4]'
                     }`}
                     dangerouslySetInnerHTML={{ __html: item.icon }}
@@ -128,7 +135,7 @@ export default function ProfilePage() {
                     )}
                     <span className="text-sm text-text-muted">&#8250;</span>
                   </div>
-                </button>
+                </Link>
               ))}
             </div>
           </div>

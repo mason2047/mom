@@ -345,10 +345,17 @@ export interface ChatMessage {
   metadata?: MessageMetadata
 }
 
+/** 安心资源卡片 */
+export interface ReassuranceCard {
+  title: string
+  links: LinkSuggestion[]
+}
+
 /** 消息元数据 */
 export interface MessageMetadata {
   links?: LinkSuggestion[]
   reportCard?: ReportCard
+  reassuranceCard?: ReassuranceCard
   surveyOptions?: SurveyOption[]
   imageUrl?: string
 }

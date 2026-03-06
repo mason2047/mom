@@ -1,6 +1,4 @@
-'use client'
-
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 /**
  * P32 - 预约成功页
@@ -36,8 +34,6 @@ const NEXT_STEPS = [
 ]
 
 export default function BookingSuccessPage() {
-  const router = useRouter()
-
   return (
     <div className="flex flex-col min-h-screen bg-bg">
 
@@ -106,18 +102,18 @@ export default function BookingSuccessPage() {
 
         {/* 操作按钮 */}
         <div className="flex gap-2.5 px-4 mt-4">
-          <button
-            onClick={() => router.push('/maternity')}
-            className="flex-1 h-[46px] rounded-[12px] bg-rose-50 text-rose border-[1.5px] border-rose text-sm font-semibold"
+          <Link
+            href="/maternity"
+            className="flex-1 h-[46px] rounded-[12px] bg-rose-50 text-rose border-[1.5px] border-rose text-sm font-semibold flex items-center justify-center"
           >
             查看我的预约
-          </button>
-          <button
-            onClick={() => router.push('/home')}
-            className="flex-1 h-[46px] rounded-[12px] bg-gradient-to-r from-rose to-rose-500 text-white text-sm font-semibold"
+          </Link>
+          <Link
+            href="/home"
+            className="flex-1 h-[46px] rounded-[12px] bg-gradient-to-r from-rose to-rose-500 text-white text-sm font-semibold flex items-center justify-center"
           >
             返回首页
-          </button>
+          </Link>
         </div>
 
         {/* 幸孕币奖励提示条 */}

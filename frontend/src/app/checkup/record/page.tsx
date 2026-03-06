@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import NavBar from '@/components/layout/NavBar'
 import Chip from '@/components/ui/Chip'
 
@@ -14,7 +13,6 @@ const RESULT_OPTIONS = ['一切正常', '有指标异常', '需要复查']
 const CHECK_ITEMS = ['大排畸超声', '血常规', '尿常规', '血压测量', '体重测量']
 
 export default function CheckupRecordPage() {
-  const router = useRouter()
   const [actualDate, setActualDate] = useState('2026-03-26')
   const [hospital, setHospital] = useState('北京妇产医院')
   const [result, setResult] = useState('一切正常')
@@ -35,12 +33,12 @@ export default function CheckupRecordPage() {
 
   const handleSubmit = () => {
     // TODO: call checkupApi.createCheckupRecord
-    router.back()
+    window.location.href = '/checkup'
   }
 
   return (
     <div className="flex flex-col min-h-screen bg-bg">
-      <NavBar title="记录产检结果" onBack={() => router.back()} />
+      <NavBar title="记录产检结果" backHref="/checkup" />
 
       <div className="flex-1 overflow-y-auto hide-scrollbar">
         {/* 基础信息 */}

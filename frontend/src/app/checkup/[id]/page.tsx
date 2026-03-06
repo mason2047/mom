@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import NavBar from '@/components/layout/NavBar'
 import Badge from '@/components/ui/Badge'
 import ToggleSwitch from '@/components/ui/ToggleSwitch'
@@ -37,11 +37,9 @@ const BRING_LIST = [
 ]
 
 export default function CheckupDetailPage() {
-  const router = useRouter()
-
   return (
     <div className="flex flex-col min-h-screen bg-bg">
-      <NavBar title="产检详情" onBack={() => router.back()} />
+      <NavBar title="产检详情" backHref="/checkup" />
 
       <div className="flex-1 overflow-y-auto hide-scrollbar pb-24">
         {/* Hero */}
@@ -140,12 +138,12 @@ export default function CheckupDetailPage() {
         <button className="flex-1 h-[46px] rounded-[12px] border-[1.5px] border-border-dark bg-white text-[15px] font-semibold text-text-secondary">
           修改时间
         </button>
-        <button
-          onClick={() => router.push('/checkup/record')}
-          className="flex-1 h-[46px] rounded-[12px] bg-primary text-white text-[15px] font-semibold"
+        <Link
+          href="/checkup/record"
+          className="flex-1 h-[46px] rounded-[12px] bg-primary text-white text-[15px] font-semibold flex items-center justify-center"
         >
           记录产检结果
-        </button>
+        </Link>
       </div>
     </div>
   )

@@ -1,6 +1,3 @@
-'use client'
-
-import { useRouter } from 'next/navigation'
 import NavBar from '@/components/layout/NavBar'
 
 /**
@@ -49,13 +46,11 @@ const MACROS = {
 }
 
 export default function DietResultPage() {
-  const router = useRouter()
-
   return (
     <div className="flex flex-col min-h-screen bg-bg">
       <NavBar
         title="识别结果"
-        onBack={() => router.back()}
+        backHref="/diet"
         rightContent={<span className="text-[13px] text-text-muted">修改</span>}
       />
 

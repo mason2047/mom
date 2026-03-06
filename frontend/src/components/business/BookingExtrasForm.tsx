@@ -125,24 +125,19 @@ export default function BookingExtrasForm({
         <h2 className="text-[15px] font-semibold text-text-primary mb-3.5">
           &#128176; 费用确认
         </h2>
-        <div className="bg-[#fff8fa] rounded-[12px] border-[1.5px] border-rose/20 p-4">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-text-primary font-medium">尊享套餐</span>
-            <span className="text-[11px] text-text-muted">28天</span>
+        <div className="bg-[#f0faf5] rounded-[10px] p-3 flex justify-between items-center">
+          <div>
+            <div className="text-[13px] text-text-secondary">尊享单人间套餐 · 28天</div>
+            <div className="text-[11px] text-text-muted mt-0.5">V1.0意向预约无需支付定金</div>
           </div>
-          <div className="flex justify-between items-baseline mb-3">
-            <span className="text-xs text-text-secondary">套餐总价</span>
-            <span className="text-xl font-bold text-rose">&#165;58,800</span>
+          <div className="text-right">
+            <div className="text-[11px] text-text-muted">意向预约</div>
+            <div className="text-xl font-bold text-rose">免费</div>
           </div>
-          <div className="border-t border-border pt-2.5">
-            <div className="flex justify-between items-center">
-              <span className="text-xs text-text-secondary">预约定金</span>
-              <span className="text-base font-bold text-rose">&#165;5,000</span>
-            </div>
-            <p className="text-[11px] text-text-muted mt-1.5">
-              定金可在入住前7天免费退款，尾款入住当天支付
-            </p>
-          </div>
+        </div>
+        <div className="text-[11px] text-text-muted mt-2 leading-relaxed">
+          · 提交后机构将在24小时内电话回访确认<br />
+          · 确认后可签订服务协议并支付定金锁定床位
         </div>
       </div>
     </>

@@ -63,6 +63,7 @@
 | 点击"查看趋势" | 跳转 `/health` | |
 | 点击健康快捷卡片 | 跳转 `/health/weight` 等 | |
 | 点击妈妈健康卡片 | 跳转 `/home/knowledge` | |
+| 点击Banner"查看孕期知识" | 跳转 `/home/knowledge` | Banner按钮Link |
 
 **优化建议:** 首页聚合接口
 ```
@@ -74,11 +75,22 @@ GET /home/dashboard
 
 ## 4. 孕期知识页 (`/home/knowledge`)
 
+包含"妈妈健康"（P02）和"宝宝发育"（P03）双 Tab，默认显示妈妈健康。
+
 | 交互 | API | 说明 |
 |------|-----|------|
 | 页面加载 | `GET /knowledge/baby-development?week=14` | 宝宝发育详情 |
 | 页面加载 | `GET /knowledge/mom-health?week=14` | 妈妈健康详情 |
+| 切换孕周 Chip | `GET /knowledge/*?week=N` | 重新加载对应周数据 |
+| 切换 Tab | 前端切换 | 妈妈健康 ↔ 宝宝发育 |
+| 点击待办清单跳转 | 跳转对应路由 | 产检日历/记录体重/记录血压 |
+| 点击 AI 浮动按钮 | 跳转 `/assistant` | 右下角固定按钮 |
 | 阅读完成(停留>30s) | `POST /user/daily-tasks/knowledge/complete` | 完成每日阅读任务 |
+
+**入口路径:**
+- 首页 Banner "查看孕期知识 ›" → `/home/knowledge`
+- 首页妈妈健康卡片 → `/home/knowledge`
+- 妈妈变化弹窗 "了解更多" → `/home/knowledge`
 
 ---
 
@@ -291,8 +303,10 @@ GET /health/dashboard
 |------|-----|------|
 | 页面加载 | `GET /auth/me` | 用户信息 |
 | 页面加载 | `GET /profile` | 孕期信息 |
-| 页面加载 | `GET /user/coins` | 幸孕币余额 |
-| 点击菜单项 | 跳转对应路由 | |
+| 页面加载 | `GET /user/coins` | 幸孕币余额（会员权益区显示） |
+| 点击"我的积分" | 跳转 `/profile/coins` | P20 幸孕币页 |
+| 点击"邀请有礼" | 跳转 `/profile/invite` | P-Share 邀请有礼页 |
+| 点击菜单项 | 跳转对应路由 | 孕期工具/生活服务/账户设置 |
 
 ---
 
@@ -316,15 +330,20 @@ GET /health/dashboard
 
 ---
 
-## 25. 幸孕币 (`/profile/coins`)
+## 25. 幸孕币 (`/profile/coins`) — P20
 
 | 交互 | API | 说明 |
 |------|-----|------|
-| 页面加载 | `GET /user/coins` | 余额 |
-| 页面加载 | `GET /user/streak` | 连续打卡 |
-| 页面加载 | `GET /user/daily-tasks?date=today` | 每日任务 |
-| 页面加载 | `GET /user/achievements` | 成就列表 |
-| 点击"去完成" | 跳转到对应功能页 | |
+| 页面加载 | `GET /user/coins` | 余额（总获得/总消耗/到期提醒） |
+| 页面加载 | `GET /coins/daily-progress` | 今日可赚进度 |
+| 页面加载 | `GET /user/streak` | 连续打卡（天数+里程碑） |
+| 页面加载 | `GET /user/daily-tasks?date=today` | 每日任务列表 |
+| 页面加载 | `GET /user/achievements?limit=5` | 成就横向预览（前5条） |
+| 页面加载 | `GET /coins/transactions?page=1&page_size=5` | 积分明细（最近5条） |
+| 点击"去记录" | 跳转到对应功能页 | 体重/血压/胎动/饮食/知识 |
+| 点击成就"全部 ›" | 跳转 `/profile/achievements` | P22-C 成就中心 |
+| 点击邀请有礼横幅 | 跳转 `/profile/invite` | P-Share 邀请有礼 |
+| 点击"去兑换" | 跳转兑换商城 | |
 
 ---
 
@@ -437,19 +456,9 @@ kick_7days    → /health/fetal-movement
 
 ---
 
-## 32. 积分明细 (`/profile/coins`) - 更新
+## 32. 积分明细（完整版） — 已合并至第25条
 
-| 交互 | API | 说明 |
-|------|-----|------|
-| 页面加载 | `GET /user/coins` | 余额 |
-| 页面加载 | `GET /coins/daily-progress` | 今日可赚进度 |
-| 页面加载 | `GET /user/streak` | 连续打卡 |
-| 页面加载 | `GET /user/daily-tasks?date=today` | 每日任务 |
-| 页面加载 | `GET /coins/transactions?page=1&page_size=20` | 积分流水列表 |
-| 切换收入/支出Tab | `GET /coins/transactions?type=income` 或 `type=expense` | 筛选 |
-| 滚动加载更多 | `GET /coins/transactions?page=N` | 分页加载 |
-| 点击"去兑换" | 跳转 `/profile/coins/shop` | 兑换商城 |
-| 点击"去完成" | 跳转到对应功能页 | |
+> 注: 幸孕币页面的 API 映射已统一在第 25 条（`/profile/coins` P20）中描述，此处不再重复。
 
 ---
 

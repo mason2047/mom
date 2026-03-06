@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import Chip from '@/components/ui/Chip'
+import DateWheelPicker from '@/components/ui/DateWheelPicker'
 import { calculateBMI, getBMICategory, getBMICategoryName, getRecommendedWeightGain, calculateEDD, formatDate } from '@/lib/utils'
 
 /**
@@ -13,9 +14,9 @@ import { calculateBMI, getBMICategory, getBMICategoryName, getRecommendedWeightG
 type Step = 1 | 2 | 3
 
 export default function OnboardingPage() {
-  const router = useRouter()
   const [step, setStep] = useState<Step>(1)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [showDatePicker, setShowDatePicker] = useState(false)
 
   // 表单状态
   const [lmpDate, setLmpDate] = useState('2025-11-25')
@@ -91,12 +92,15 @@ export default function OnboardingPage() {
               末次月经日期（LMP）
               <span className="text-primary text-[11px]">必填</span>
             </label>
-            <input
-              type="date"
-              value={lmpDate}
-              onChange={(e) => setLmpDate(e.target.value)}
-              className="form-input-filled"
-            />
+            <button
+              type="button"
+              onClick={() => setShowDatePicker(true)}
+              className="form-input-filled w-full text-left"
+            >
+              {lmpDate
+                ? `${new Date(lmpDate).getFullYear()}年${new Date(lmpDate).getMonth() + 1}月${new Date(lmpDate).getDate()}日`
+                : '请选择日期'}
+            </button>
             <p className="text-[11px] text-text-muted mt-1">系统将自动计算你的预产期和当前孕周</p>
           </div>
 
@@ -207,7 +211,7 @@ export default function OnboardingPage() {
               {[
                 { key: 'hypertension_history', label: '妊高症史' },
                 { key: 'gestational_diabetes', label: '妊娠糖尿病' },
-                { key: 'advanced_age', label: '高龄（>35岁）' },
+                { key: 'advanced_age', label: '高龄（\u226535岁）' },
                 { key: 'none', label: '无' },
               ].map((item) => (
                 <Chip
@@ -253,6 +257,31 @@ export default function OnboardingPage() {
         </div>
       </div>
 
+      {/* 日期选择器弹窗 */}
+      {showDatePicker && (
+        <div className="fixed inset-0 z-[200] flex items-end justify-center">
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setShowDatePicker(false)}
+          />
+          <div className="relative w-full max-w-[375px] animate-slide-up">
+            <DateWheelPicker
+              initialDate={{
+                year: lmpDate ? new Date(lmpDate).getFullYear() : new Date().getFullYear(),
+                month: lmpDate ? new Date(lmpDate).getMonth() + 1 : new Date().getMonth() + 1,
+                day: lmpDate ? new Date(lmpDate).getDate() : new Date().getDate(),
+              }}
+              onConfirm={(date) => {
+                const m = String(date.month).padStart(2, '0')
+                const d = String(date.day).padStart(2, '0')
+                setLmpDate(`${date.year}-${m}-${d}`)
+                setShowDatePicker(false)
+              }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* 建档成功弹窗 */}
       {showSuccessModal && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center">
@@ -271,12 +300,12 @@ export default function OnboardingPage() {
                 当前孕周 · 孕14周3天
               </div>
             </div>
-            <button
-              onClick={() => router.push('/home')}
-              className="w-full h-[50px] rounded-button bg-gradient-to-r from-primary-400 to-primary-700 text-white text-base font-semibold"
+            <Link
+              href="/home"
+              className="w-full h-[50px] rounded-button bg-gradient-to-r from-primary-400 to-primary-700 text-white text-base font-semibold flex items-center justify-center"
             >
               开始孕期旅程 →
-            </button>
+            </Link>
           </div>
         </div>
       )}

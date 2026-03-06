@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import NavBar from '@/components/layout/NavBar'
 
 /**
@@ -127,7 +126,6 @@ const STATUS_CONFIG: Record<AchievementStatus, { label: string; className: strin
 }
 
 export default function AchievementsPage() {
-  const router = useRouter()
   const [activeTab, setActiveTab] = useState<TabKey>('all')
 
   const unlockedCount = MOCK_ACHIEVEMENTS.filter((a) => a.status === 'unlocked').length
@@ -145,7 +143,7 @@ export default function AchievementsPage() {
     <div className="flex flex-col min-h-screen bg-bg">
       <NavBar
         title="成就中心"
-        onBack={() => router.back()}
+        backHref="/profile"
         rightContent={
           <span className="text-xs text-text-muted">已解锁 {unlockedCount}/{MOCK_ACHIEVEMENTS.length}</span>
         }

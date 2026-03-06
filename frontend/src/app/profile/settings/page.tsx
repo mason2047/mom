@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import NavBar from '@/components/layout/NavBar'
 import ToggleSwitch from '@/components/ui/ToggleSwitch'
 
@@ -11,7 +10,6 @@ import ToggleSwitch from '@/components/ui/ToggleSwitch'
  */
 
 export default function SettingsPage() {
-  const router = useRouter()
   const [checkupReminder, setCheckupReminder] = useState(true)
   const [dailyReminder, setDailyReminder] = useState(true)
   const [dietReminder, setDietReminder] = useState(false)
@@ -19,7 +17,7 @@ export default function SettingsPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg">
-      <NavBar title="设置" onBack={() => router.back()} />
+      <NavBar title="设置" backHref="/profile" />
 
       <div className="flex-1 overflow-y-auto hide-scrollbar">
         {/* 提醒设置 */}

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import NavBar from '@/components/layout/NavBar'
 
 /**
@@ -45,7 +44,6 @@ const PERCENTILE_REFS: Record<number, { p10: number; p50: number; p90: number }>
 }
 
 export default function FetalWeightPage() {
-  const router = useRouter()
   const [ultrasound, setUltrasound] = useState<UltrasoundData>(MOCK_ULTRASOUND)
   const estimatedWeight = 320
   const percentileRange = 'P35~P65'
@@ -77,7 +75,7 @@ export default function FetalWeightPage() {
     <div className="flex flex-col min-h-screen bg-bg">
       <NavBar
         title="胎儿估重"
-        onBack={() => router.back()}
+        backHref="/health"
         rightContent={
           <span className="text-[13px] text-primary font-medium">录入</span>
         }

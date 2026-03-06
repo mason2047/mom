@@ -67,6 +67,28 @@ export default function ChatBubble({ message, onLinkClick }: ChatBubbleProps) {
           </div>
         )}
 
+        {/* 安心资源卡片 */}
+        {message.metadata?.reassuranceCard && (
+          <div className="bg-[#fdf6ee] rounded-[10px] px-3 py-2.5 mt-1.5">
+            <div className="text-[11px] text-primary font-bold mb-1.5">
+              {message.metadata.reassuranceCard.title}
+            </div>
+            {message.metadata.reassuranceCard.links.map((link, i) => (
+              <button
+                key={i}
+                onClick={() => onLinkClick?.(link)}
+                className={`w-full py-1.5 text-xs text-primary text-left flex items-center gap-1 ${
+                  i < message.metadata!.reassuranceCard!.links.length - 1
+                    ? 'border-b border-[#f5f0ea]'
+                    : ''
+                }`}
+              >
+                <span>&#8250;</span> {link.text}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* 报告卡片 */}
         {message.metadata?.reportCard && (
           <div className="bg-white rounded-[14px] p-3.5 shadow-card-md mt-1.5 border border-[rgba(232,124,62,0.15)]">

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import NavBar from '@/components/layout/NavBar'
 import Chip from '@/components/ui/Chip'
 
@@ -10,18 +9,20 @@ import Chip from '@/components/ui/Chip'
  * 空腹/餐后1h/餐后2h标签页，标准线趋势图，录入区
  */
 
-type MeasureTime = 'fasting' | 'post1h' | 'post2h'
+type MeasureTime = 'fasting' | 'post1h' | 'post2h' | 'bedtime'
 
 const TIME_LABELS: { key: MeasureTime; label: string }[] = [
   { key: 'fasting', label: '空腹' },
   { key: 'post1h', label: '餐后1h' },
   { key: 'post2h', label: '餐后2h' },
+  { key: 'bedtime', label: '睡前' },
 ]
 
 const STANDARDS: Record<MeasureTime, string> = {
   fasting: '孕期空腹血糖标准：< 5.1 mmol/L',
   post1h: '孕期餐后1h血糖标准：< 10.0 mmol/L',
   post2h: '孕期餐后2h血糖标准：< 8.5 mmol/L',
+  bedtime: '孕期睡前血糖参考：4.4~6.7 mmol/L',
 }
 
 const MOCK_RECORDS = [
@@ -30,7 +31,6 @@ const MOCK_RECORDS = [
 ]
 
 export default function BloodSugarPage() {
-  const router = useRouter()
   const [activeTab, setActiveTab] = useState<MeasureTime>('fasting')
   const [bloodSugar, setBloodSugar] = useState('4.8')
   const [measureTime, setMeasureTime] = useState<MeasureTime>('fasting')
@@ -41,7 +41,7 @@ export default function BloodSugarPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg">
-      <NavBar title="血糖记录" onBack={() => router.back()} />
+      <NavBar title="血糖记录" backHref="/health" />
 
       <div className="flex-1 overflow-y-auto hide-scrollbar">
         {/* Type Tabs */}
@@ -154,8 +154,13 @@ export default function BloodSugarPage() {
             />
             <span className="text-lg text-text-muted font-medium">mmol/L</span>
           </div>
-          <div className="bg-bg rounded-input p-3 text-xs text-text-secondary leading-relaxed mb-3.5">
+          <div className="bg-bg rounded-input p-3 text-xs text-text-secondary leading-relaxed mb-2.5">
             孕期血糖标准：空腹 &lt;5.1 | 餐后1h &lt;10.0 | 餐后2h &lt;8.5
+          </div>
+          {/* GDM 专项提醒 */}
+          <div className="bg-[#fef0f0] rounded-input p-3 text-xs text-danger leading-relaxed mb-3.5 border border-[#ffe0e0]">
+            &#9888;&#65039; <strong>GDM 专项提醒：</strong>如已确诊妊娠糖尿病，请严格按医嘱监测血糖。
+            空腹 &#8805;5.1 或餐后2h &#8805;8.5 需及时联系医生调整饮食/用药方案。
           </div>
           <button onClick={handleSave} className="btn-primary">
             保存记录

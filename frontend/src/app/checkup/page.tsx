@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import NavBar from '@/components/layout/NavBar'
+import TabBar from '@/components/layout/TabBar'
 import Badge from '@/components/ui/Badge'
 import ToggleSwitch from '@/components/ui/ToggleSwitch'
 
@@ -31,7 +32,7 @@ const MOCK_CHECKUPS = [
     id: '2',
     title: '第2次产检',
     weekRange: '孕14~19+6周',
-    dateInfo: '已于 3月7日 完成',
+    dateInfo: '已于 3月13日 完成',
     status: 'done' as const,
     items: ['唐氏筛查（中期）', '血常规', '尿常规'],
   },
@@ -66,7 +67,6 @@ function generateCalendarDays(year: number, month: number) {
 }
 
 export default function CheckupPage() {
-  const router = useRouter()
   const [viewMode, setViewMode] = useState<ViewMode>('calendar')
   const [selectedDay, setSelectedDay] = useState(13)
   const [currentMonth] = useState({ year: 2026, month: 2 }) // March 2026
@@ -81,7 +81,7 @@ export default function CheckupPage() {
     <div className="flex flex-col min-h-screen bg-bg">
       <NavBar
         title="产检计划"
-        onBack={() => router.push('/home')}
+        backHref="/home"
         rightContent={<span className="text-[13px] text-primary font-medium">+ 添加</span>}
       />
 
@@ -184,6 +184,9 @@ export default function CheckupPage() {
               <div className="flex items-center gap-1.5 text-[11px] text-text-muted">
                 <div className="w-2 h-2 rounded-full bg-danger" />已逾期
               </div>
+              <div className="flex items-center gap-1.5 text-[11px] text-text-muted">
+                <div className="w-2 h-2 rounded-full bg-[#fff3eb] border border-primary" />今日
+              </div>
             </div>
           </>
         )}
@@ -199,12 +202,12 @@ export default function CheckupPage() {
             <div className="bg-white rounded-card p-6 shadow-card mb-3 text-center">
               <div className="text-4xl mb-2">📅</div>
               <div className="text-sm text-text-muted mb-3">当天无产检安排</div>
-              <button
-                onClick={() => router.push('/checkup/record')}
+              <Link
+                href="/checkup/record"
                 className="px-5 py-2 rounded-chip bg-primary text-white text-xs font-medium"
               >
                 + 去添加
-              </button>
+              </Link>
             </div>
           )}
 
@@ -259,26 +262,22 @@ export default function CheckupPage() {
                 </div>
               </div>
               <div className="flex gap-2 mt-3 pt-3 border-t border-border">
-                <button
-                  onClick={() => router.push(`/checkup/${checkup.id}`)}
-                  className="flex-1 h-[34px] rounded-button border-[1.5px] border-border-dark bg-white text-[13px] font-medium text-text-secondary"
+                <Link
+                  href={`/checkup/${checkup.id}`}
+                  className="flex-1 h-[34px] rounded-button border-[1.5px] border-border-dark bg-white text-[13px] font-medium text-text-secondary flex items-center justify-center"
                 >
                   {checkup.status === 'done' ? '查看记录' : '查看详情'}
-                </button>
-                <button
-                  onClick={() =>
-                    checkup.status === 'done'
-                      ? router.push('/assistant/report-upload')
-                      : router.push('/checkup/record')
-                  }
-                  className={`flex-1 h-[34px] rounded-button text-[13px] font-medium ${
+                </Link>
+                <Link
+                  href={checkup.status === 'done' ? '/assistant/report-upload' : '/checkup/record'}
+                  className={`flex-1 h-[34px] rounded-button text-[13px] font-medium flex items-center justify-center ${
                     checkup.status === 'done'
                       ? 'bg-[#eef2ff] text-blue border-none'
                       : 'bg-primary text-white border-none'
                   }`}
                 >
                   {checkup.status === 'done' ? 'AI解读报告' : '记录产检'}
-                </button>
+                </Link>
               </div>
             </div>
           ))}
@@ -299,6 +298,8 @@ export default function CheckupPage() {
           </div>
         </div>
       </div>
+
+      <TabBar />
     </div>
   )
 }

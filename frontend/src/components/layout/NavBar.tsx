@@ -1,16 +1,9 @@
-'use client'
+import Link from 'next/link'
 
-import { useRouter } from 'next/navigation'
-
-/**
- * 导航栏组件
- * 支持返回按钮、标题、右侧操作
- */
 interface NavBarProps {
   title: string
   showBack?: boolean
   backHref?: string
-  onBack?: () => void
   rightContent?: React.ReactNode
   className?: string
 }
@@ -18,35 +11,22 @@ interface NavBarProps {
 export default function NavBar({
   title,
   showBack = true,
-  backHref,
-  onBack,
+  backHref = '/',
   rightContent,
   className = '',
 }: NavBarProps) {
-  const router = useRouter()
-
-  const handleBack = () => {
-    if (onBack) {
-      onBack()
-    } else if (backHref) {
-      router.push(backHref)
-    } else {
-      router.back()
-    }
-  }
-
   return (
     <div
-      className={`h-[52px] bg-white flex items-center px-4 border-b border-border gap-3 sticky top-11 z-[99] ${className}`}
+      className={`h-[52px] bg-white flex items-center px-4 border-b border-border gap-3 sticky top-0 z-[99] ${className}`}
     >
       {showBack ? (
-        <button
-          onClick={handleBack}
+        <Link
+          href={backHref}
           className="w-8 h-8 rounded-full bg-bg flex items-center justify-center text-base"
           aria-label="返回"
         >
-          &#8249;
-        </button>
+          ‹
+        </Link>
       ) : (
         <div className="w-8" />
       )}

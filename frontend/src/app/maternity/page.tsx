@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import NavBar from '@/components/layout/NavBar'
 
 /**
@@ -22,6 +22,7 @@ const MOCK_CENTERS = [
     tags: ['明星推荐', '五星级', '产后康复'],
     cert: true,
     rec: true,
+    bedsLeft: 3,
   },
   {
     id: '2',
@@ -33,6 +34,7 @@ const MOCK_CENTERS = [
     tags: ['中医调理', '母婴同室'],
     cert: true,
     rec: false,
+    bedsLeft: 0,
   },
 ]
 
@@ -50,18 +52,17 @@ const MOCK_NANNIES = [
   },
 ]
 
-const FILTER_CHIPS = ['附近优先', '评分最高', '价格低到高', '有空档']
+const FILTER_CHIPS = ['综合推荐 \u25be', '地区 \u25be', '价格 \u25be', '评分4.5+', '特色 \u25be']
 
 export default function MaternityPage() {
-  const router = useRouter()
   const [activeTab, setActiveTab] = useState<TabType>('center')
-  const [activeFilter, setActiveFilter] = useState('附近优先')
+  const [activeFilter, setActiveFilter] = useState('综合推荐 \u25be')
 
   return (
     <div className="flex flex-col min-h-screen bg-bg">
       <NavBar
         title="月子规划"
-        onBack={() => router.push('/profile')}
+        backHref="/profile"
         rightContent={<span className="text-[13px] text-rose font-medium">&#128269; 搜索</span>}
       />
 
@@ -129,12 +130,17 @@ export default function MaternityPage() {
 
         {/* Service List */}
         <div className="p-4 flex flex-col gap-3">
+          {activeTab === 'center' && (
+            <div className="text-xs text-text-muted py-1">
+              &#129302; AI 根据你的孕周和位置为你推荐
+            </div>
+          )}
           {activeTab === 'center'
             ? MOCK_CENTERS.map((center) => (
-                <button
+                <Link
                   key={center.id}
-                  onClick={() => router.push(`/maternity/center/${center.id}`)}
-                  className="bg-white rounded-card overflow-hidden shadow-card text-left"
+                  href={`/maternity/center/${center.id}`}
+                  className="bg-white rounded-card overflow-hidden shadow-card text-left block"
                 >
                   <div className="w-full h-[130px] bg-gradient-to-br from-[#fff0f4] to-[#ffe0ea] flex items-center justify-center text-[50px] relative">
                     &#127968;
@@ -158,8 +164,15 @@ export default function MaternityPage() {
                       <span>{center.reviews}条评价</span>
                       <span>{center.distance}</span>
                     </div>
-                    <div className="text-[15px] font-bold text-rose mb-2">
-                      &#165;{center.price}<span className="text-[11px] text-text-muted font-normal">起/28天</span>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-[15px] font-bold text-rose">
+                        &#165;{center.price}<span className="text-[11px] text-text-muted font-normal">起/28天</span>
+                      </div>
+                      {center.bedsLeft > 0 && (
+                        <div className="text-[11px] text-rose font-medium">
+                          &#128293; 床位剩余{center.bedsLeft}间
+                        </div>
+                      )}
                     </div>
                     <div className="flex flex-wrap gap-1.5 mb-2.5">
                       {center.tags.map((tag) => (
@@ -177,13 +190,13 @@ export default function MaternityPage() {
                       </span>
                     </div>
                   </div>
-                </button>
+                </Link>
               ))
             : MOCK_NANNIES.map((nanny) => (
-                <button
+                <Link
                   key={nanny.id}
-                  onClick={() => router.push(`/maternity/nanny/${nanny.id}`)}
-                  className="bg-white rounded-card p-3.5 shadow-card text-left"
+                  href={`/maternity/nanny/${nanny.id}`}
+                  className="bg-white rounded-card p-3.5 shadow-card text-left block"
                 >
                   <div className="flex gap-3 mb-2.5">
                     <div className="w-[60px] h-[60px] rounded-full bg-gradient-to-br from-[#ffb8c8] to-[#ff8090] flex items-center justify-center text-[28px] flex-shrink-0">
@@ -231,7 +244,7 @@ export default function MaternityPage() {
                       立即预约
                     </span>
                   </div>
-                </button>
+                </Link>
               ))}
         </div>
       </div>

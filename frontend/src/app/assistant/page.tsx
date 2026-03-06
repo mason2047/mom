@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import TabBar from '@/components/layout/TabBar'
 import ChatBubble from '@/components/business/ChatBubble'
 import type { ChatMessage } from '@/types'
@@ -92,11 +92,14 @@ const MOCK_MESSAGES: ChatMessage[] = [
     content: '这份担心很真实，我完全理解你。\n\n先给你一个安心数据：中期唐筛整体高风险率只有约3~5%，绝大多数妈妈都是低风险结果。\n\n而且，即使唐筛显示高风险，也**不代表宝宝有问题**，只是提示需要进一步检查（无创DNA或羊水穿刺），确诊率才是真正重要的数据。\n\n在结果出来之前，与其一直担心，不如把能做的事情做好：按时产检、保持好心情、适当运动。你身边有人陪你去产检吗？',
     timestamp: '2026-03-06T14:38:00Z',
     metadata: {
-      links: [
-        { text: '了解唐筛高风险后的处理流程', route: '/home/knowledge' },
-        { text: '孕期焦虑自我疏导小技巧', route: '/home/knowledge' },
-        { text: '记录今日心情（情绪日记）', route: '/assistant' },
-      ],
+      reassuranceCard: {
+        title: '\u{1F49B} 给你一些安心资源',
+        links: [
+          { text: '了解唐筛高风险后的处理流程', route: '/home/knowledge' },
+          { text: '孕期焦虑自我疏导小技巧', route: '/home/knowledge' },
+          { text: '记录今日心情（情绪日记）', route: '/assistant' },
+        ],
+      },
     },
   },
 ]
@@ -139,7 +142,6 @@ function TypewriterBubble({
 const HAS_PROFILE = true
 
 export default function AssistantPage() {
-  const router = useRouter()
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [inputText, setInputText] = useState('')
   const [isTyping, setIsTyping] = useState(false)
@@ -263,12 +265,12 @@ export default function AssistantPage() {
                 </div>
                 <span className="text-[48px]">&#128203;</span>
               </div>
-              <button
-                onClick={() => router.push('/onboarding')}
-                className="w-full py-3 bg-gradient-to-r from-primary-400 to-primary rounded-[12px] text-[13px] font-bold text-white shadow-button"
+              <Link
+                href="/onboarding"
+                className="w-full py-3 bg-gradient-to-r from-primary-400 to-primary rounded-[12px] text-[13px] font-bold text-white shadow-button block text-center"
               >
                 录入我的预产期
-              </button>
+              </Link>
             </div>
           </div>
         )}
@@ -294,26 +296,40 @@ export default function AssistantPage() {
         <div className="px-4 pb-3">
           <div className="text-xs text-text-muted font-semibold mb-2">快捷功能</div>
           <div className="grid grid-cols-3 gap-2">
-            {shortcuts.map((s) => (
-              <button
-                key={s.name}
-                onClick={() => !s.disabled && router.push(s.route)}
-                className={`bg-white rounded-[14px] p-3 text-center shadow-card transition-transform ${
-                  s.disabled ? 'opacity-50 cursor-not-allowed' : 'active:scale-[0.96]'
-                }`}
-                disabled={s.disabled}
-              >
+            {shortcuts.map((s) =>
+              s.disabled ? (
                 <div
-                  className="w-11 h-11 rounded-xl flex items-center justify-center text-[26px] mx-auto mb-1.5"
-                  style={{ background: s.iconBg }}
-                  dangerouslySetInnerHTML={{ __html: s.icon }}
-                />
-                <div className="text-xs font-bold text-text-primary">{s.name}</div>
-                <div className="text-[10px] text-text-muted mt-0.5 leading-tight whitespace-pre-line">
-                  {s.desc}
+                  key={s.name}
+                  className="bg-white rounded-[14px] p-3 text-center shadow-card opacity-50 cursor-not-allowed"
+                >
+                  <div
+                    className="w-11 h-11 rounded-xl flex items-center justify-center text-[26px] mx-auto mb-1.5"
+                    style={{ background: s.iconBg }}
+                    dangerouslySetInnerHTML={{ __html: s.icon }}
+                  />
+                  <div className="text-xs font-bold text-text-primary">{s.name}</div>
+                  <div className="text-[10px] text-text-muted mt-0.5 leading-tight whitespace-pre-line">
+                    {s.desc}
+                  </div>
                 </div>
-              </button>
-            ))}
+              ) : (
+                <Link
+                  key={s.name}
+                  href={s.route}
+                  className="bg-white rounded-[14px] p-3 text-center shadow-card transition-transform active:scale-[0.96]"
+                >
+                  <div
+                    className="w-11 h-11 rounded-xl flex items-center justify-center text-[26px] mx-auto mb-1.5"
+                    style={{ background: s.iconBg }}
+                    dangerouslySetInnerHTML={{ __html: s.icon }}
+                  />
+                  <div className="text-xs font-bold text-text-primary">{s.name}</div>
+                  <div className="text-[10px] text-text-muted mt-0.5 leading-tight whitespace-pre-line">
+                    {s.desc}
+                  </div>
+                </Link>
+              )
+            )}
           </div>
         </div>
 
@@ -361,7 +377,7 @@ export default function AssistantPage() {
               <ChatBubble
                 key={msg.id}
                 message={msg}
-                onLinkClick={(link) => router.push(link.route)}
+                onLinkClick={(link) => { window.location.href = link.route }}
               />
             )
           )}

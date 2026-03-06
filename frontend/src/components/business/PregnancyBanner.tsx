@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { formatDate, formatGestationalAge, getTrimesterName } from '@/lib/utils'
 import type { GestationalInfo } from '@/types'
 
@@ -29,9 +30,12 @@ export default function PregnancyBanner({ gestationalInfo, currentDate }: Pregna
         <div className="text-[11px] text-[#b8895a] mt-1.5">
           {getTrimesterName(trimester)} · 距预产期还有 {daysUntilEdd} 天
         </div>
-        <div className="inline-block mt-2.5 px-3 py-1 bg-[rgba(232,124,62,0.15)] rounded-chip text-[11px] text-primary border border-[rgba(232,124,62,0.3)]">
+        <Link
+          href="/home/knowledge"
+          className="inline-block mt-2.5 px-3 py-1 bg-[rgba(232,124,62,0.15)] rounded-chip text-[11px] text-primary border border-[rgba(232,124,62,0.3)]"
+        >
           查看孕期知识 ›
-        </div>
+        </Link>
       </div>
 
       {/* 右侧孕妇插画 SVG */}

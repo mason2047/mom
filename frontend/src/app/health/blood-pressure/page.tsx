@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import NavBar from '@/components/layout/NavBar'
 
 /**
@@ -16,9 +15,24 @@ const MOCK_RECORDS = [
 ]
 
 export default function BloodPressurePage() {
-  const router = useRouter()
   const [systolic, setSystolic] = useState('128')
   const [diastolic, setDiastolic] = useState('82')
+
+  // Blood pressure grading
+  const getSystolicGrade = (val: number) => {
+    if (val < 120) return { label: '正常', color: 'text-green', bg: 'bg-[#e8f5ee]' }
+    if (val < 140) return { label: '偏高', color: 'text-primary', bg: 'bg-[#fff3eb]' }
+    return { label: '高血压', color: 'text-danger', bg: 'bg-[#fef0f0]' }
+  }
+
+  const getDiastolicGrade = (val: number) => {
+    if (val < 80) return { label: '正常', color: 'text-green', bg: 'bg-[#e8f5ee]' }
+    if (val < 90) return { label: '偏高', color: 'text-primary', bg: 'bg-[#fff3eb]' }
+    return { label: '高血压', color: 'text-danger', bg: 'bg-[#fef0f0]' }
+  }
+
+  const sysGrade = getSystolicGrade(parseInt(systolic) || 0)
+  const diaGrade = getDiastolicGrade(parseInt(diastolic) || 0)
 
   const handleSave = () => {
     // TODO: healthApi.addBloodPressureRecord
@@ -26,7 +40,7 @@ export default function BloodPressurePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg">
-      <NavBar title="血压记录" onBack={() => router.back()} />
+      <NavBar title="血压记录" backHref="/health" />
 
       <div className="flex-1 overflow-y-auto hide-scrollbar">
         {/* Warning Banner */}
@@ -139,10 +153,21 @@ export default function BloodPressurePage() {
             />
             <span className="text-[13px] text-text-muted pl-2">mmHg</span>
           </div>
-          <div className="flex mb-3.5">
+          <div className="flex mb-2">
             <div className="flex-1 text-center text-xs text-text-muted">收缩压（高压）</div>
             <div className="w-8" />
             <div className="flex-1 text-center text-xs text-text-muted">舒张压（低压）</div>
+            <div className="w-12" />
+          </div>
+          {/* Grading color indicator */}
+          <div className="flex gap-2.5 items-center mb-3.5">
+            <div className={`flex-1 text-center py-1.5 rounded-lg text-xs font-medium ${sysGrade.bg} ${sysGrade.color}`}>
+              {sysGrade.label}
+            </div>
+            <div className="w-8" />
+            <div className={`flex-1 text-center py-1.5 rounded-lg text-xs font-medium ${diaGrade.bg} ${diaGrade.color}`}>
+              {diaGrade.label}
+            </div>
             <div className="w-12" />
           </div>
           <div className="bg-bg rounded-input p-3 text-xs text-text-secondary leading-relaxed mb-3.5">

@@ -1,9 +1,6 @@
-'use client'
-
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import NavBar from '@/components/layout/NavBar'
 import IndicatorProgressBar from '@/components/business/IndicatorProgressBar'
-import IndicatorTrendChart from '@/components/business/IndicatorTrendChart'
 import type { IndicatorStatus } from '@/types'
 
 /**
@@ -23,10 +20,10 @@ interface IndicatorItem {
 
 const MOCK_SUMMARY = {
   reportType: '血常规',
-  date: '2026年3月7日',
-  totalItems: 18,
-  normalCount: 16,
-  abnormalCount: 2,
+  date: '2026-03-06 · 孕14周产检',
+  normalCount: 8,
+  warnCount: 2,
+  alertCount: 0,
 }
 
 const MOCK_INDICATORS: IndicatorItem[] = [
@@ -75,49 +72,47 @@ const STATUS_CONFIG = {
 }
 
 export default function ReportResultPage() {
-  const router = useRouter()
-
   return (
     <div className="flex flex-col min-h-screen bg-bg">
       <NavBar
         title="报告解读"
-        onBack={() => router.back()}
+        backHref="/assistant"
         rightContent={<span className="text-[13px] text-primary font-medium">分享</span>}
       />
 
       <div className="flex-1 overflow-y-auto hide-scrollbar">
-        {/* Summary Card */}
-        <div className="bg-gradient-to-br from-[#fdf0e0] to-[#fce8cc] px-5 py-5 border-b border-border">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-3xl">&#128202;</span>
-            <div>
-              <h2 className="text-lg font-bold text-[#3d1f00]">
-                {MOCK_SUMMARY.reportType} 解读报告
-              </h2>
-              <p className="text-xs text-[#8a5a30]">{MOCK_SUMMARY.date}</p>
+        {/* Summary Card - P11 */}
+        <div className="px-4 pt-3.5">
+          <div className="bg-white rounded-[14px] p-3.5 shadow-card mb-3">
+            <div className="flex items-center gap-2 mb-2.5">
+              <span className="text-[24px]">&#129656;</span>
+              <div>
+                <div className="text-sm font-extrabold text-text-primary">{MOCK_SUMMARY.reportType}</div>
+                <div className="text-[11px] text-text-muted">{MOCK_SUMMARY.date}</div>
+              </div>
             </div>
-          </div>
-          <div className="bg-white/70 rounded-[14px] px-4 py-3 flex backdrop-blur-sm">
-            <div className="flex-1 text-center border-r border-primary/15">
-              <div className="text-xl font-extrabold text-text-primary">{MOCK_SUMMARY.totalItems}</div>
-              <div className="text-[11px] text-text-muted">检测项目</div>
-            </div>
-            <div className="flex-1 text-center border-r border-primary/15">
-              <div className="text-xl font-extrabold text-green">{MOCK_SUMMARY.normalCount}</div>
-              <div className="text-[11px] text-text-muted">正常</div>
-            </div>
-            <div className="flex-1 text-center">
-              <div className="text-xl font-extrabold text-danger">{MOCK_SUMMARY.abnormalCount}</div>
-              <div className="text-[11px] text-text-muted">异常</div>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="bg-bg rounded-[10px] p-2 text-center">
+                <div className="text-xl font-extrabold text-text-primary">{MOCK_SUMMARY.normalCount}</div>
+                <div className="text-[10px] text-text-muted">指标正常</div>
+              </div>
+              <div className="bg-[#fff3e0] rounded-[10px] p-2 text-center">
+                <div className="text-xl font-extrabold text-primary">{MOCK_SUMMARY.warnCount}</div>
+                <div className="text-[10px] text-text-muted">偏低关注</div>
+              </div>
+              <div className="bg-bg rounded-[10px] p-2 text-center">
+                <div className="text-xl font-extrabold text-text-primary">{MOCK_SUMMARY.alertCount}</div>
+                <div className="text-[10px] text-text-muted">明显异常</div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* AI Summary */}
-        <div className="mx-4 mt-3 bg-[#f0faf5] border-l-[3px] border-teal rounded-r-[12px] px-3.5 py-3">
-          <div className="text-xs font-semibold text-[#1a6a50] mb-1">&#129302; AI总结</div>
-          <div className="text-xs text-[#2a6a50] leading-relaxed">
-            本次血常规整体正常。血红蛋白略低（105 g/L），属于孕期轻度贫血，建议加强铁剂补充。白细胞偏高属于孕期正常生理现象。其余指标均在正常范围内，无需特别担心。
+        {/* AI Overall Assessment - P11 */}
+        <div className="mx-4 bg-white rounded-[14px] p-3 border-l-4 border-primary shadow-card mb-3">
+          <div className="text-xs font-bold text-primary mb-1.5">&#129302; MOM助手综合解读</div>
+          <div className="text-xs text-text-secondary leading-[1.7]">
+            本次血常规整体<strong>基本正常</strong>，有两项轻微偏低（血红蛋白、红细胞），孕期因血容量增加导致生理性贫血是正常现象，暂无需特别担心，但建议适当增加铁质摄入，在下次产检时与医生确认是否需要补铁剂。
           </div>
         </div>
 
@@ -159,20 +154,39 @@ export default function ReportResultPage() {
           </div>
         </div>
 
-        {/* Historical Trend Chart */}
+        {/* Historical Trend Chart - P11 design */}
         <div className="px-4 mb-3">
-          <IndicatorTrendChart
-            title="血红蛋白 (Hb)"
-            unit="g/L"
-            data={[
-              { week: 10, value: 115 },
-              { week: 11, value: 112 },
-              { week: 12, value: 110 },
-              { week: 13, value: 108 },
-              { week: 14, value: 105 },
-            ]}
-            trendDesc="近5周呈缓慢下降趋势，属于孕期生理性变化，建议加强铁剂补充。"
-          />
+          <div className="bg-white rounded-card p-3.5 shadow-card">
+            <div className="text-xs font-bold text-text-primary mb-2">
+              &#128200; 历史对比：血红蛋白趋势
+            </div>
+            <div className="flex items-end gap-1.5 h-[50px] mb-2">
+              {[
+                { value: 112, week: '孕11周', highlight: false },
+                { value: 108, week: '孕13周', highlight: false },
+                { value: 105, week: '孕14周', highlight: true },
+              ].map((bar, i) => (
+                <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
+                  <div className={`text-[9px] font-semibold ${bar.highlight ? 'text-[#1565c0] font-bold' : 'text-text-muted'}`}>
+                    {bar.value}
+                  </div>
+                  <div
+                    className="w-full rounded-t-[4px]"
+                    style={{
+                      background: bar.highlight ? '#1565c0' : i === 0 ? '#bbdefb' : '#90caf9',
+                      height: `${(bar.value - 100) * 3}px`,
+                    }}
+                  />
+                  <div className={`text-[9px] ${bar.highlight ? 'text-[#1565c0] font-bold' : 'text-text-muted'}`}>
+                    {bar.week}{bar.highlight && '\u2193'}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="text-[11px] text-text-muted">
+              轻微下降趋势，属孕期生理性贫血，注意补铁
+            </div>
+          </div>
         </div>
 
         {/* Suggestion */}
@@ -183,20 +197,17 @@ export default function ReportResultPage() {
         </div>
       </div>
 
-      {/* Bottom Actions */}
+      {/* Bottom Actions - P11 */}
       <div className="flex gap-2.5 p-4 bg-white border-t border-border">
-        <button
-          onClick={() => router.push('/assistant')}
-          className="flex-1 h-[46px] rounded-[12px] border-[1.5px] border-border-dark bg-white text-[15px] font-semibold text-text-secondary"
-        >
-          &#128172; 继续提问
+        <button className="flex-1 h-[46px] rounded-[12px] border-[1.5px] border-primary-400 bg-white text-xs font-bold text-primary flex items-center justify-center">
+          分享给医生
         </button>
-        <button
-          onClick={() => router.push('/checkup')}
-          className="flex-1 h-[46px] rounded-[12px] bg-primary text-white text-[15px] font-semibold"
+        <Link
+          href="/assistant"
+          className="flex-1 h-[46px] rounded-[12px] bg-gradient-to-r from-primary-400 to-primary text-white text-xs font-bold flex items-center justify-center shadow-button"
         >
-          查看产检计划
-        </button>
+          继续提问
+        </Link>
       </div>
     </div>
   )

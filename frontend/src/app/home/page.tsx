@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import TabBar from '@/components/layout/TabBar'
 import PregnancyBanner from '@/components/business/PregnancyBanner'
 import BabyTalkCard from '@/components/business/BabyTalkCard'
@@ -22,7 +22,6 @@ import type { GestationalInfo } from '@/types'
 const MOCK_LMP = '2025-11-25'
 
 export default function HomePage() {
-  const router = useRouter()
   const gestationalInfo = calculateGestationalInfo(MOCK_LMP)
   const [showMomChangeModal, setShowMomChangeModal] = useState(false)
 
@@ -61,7 +60,7 @@ export default function HomePage() {
 
         {/* 妈妈健康 */}
         <div className="mx-4 mb-3">
-          <Card onClick={() => router.push('/home/knowledge')}>
+          <Card onClick={() => { window.location.href = '/home/knowledge' }}>
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-bold text-rose flex items-center gap-1">
                 &#129328; 妈妈健康
@@ -112,12 +111,12 @@ export default function HomePage() {
         <div className="px-4 mb-3">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-bold text-text-primary">&#128197;&#65039; 产检信息</span>
-            <button
-              onClick={() => router.push('/checkup')}
+            <Link
+              href="/checkup"
               className="text-[11px] text-primary"
             >
               查看全部 ›
-            </button>
+            </Link>
           </div>
           <Card>
             <div className="flex items-center gap-1.5 mb-2.5">
@@ -142,12 +141,12 @@ export default function HomePage() {
                 <div className="text-xs font-bold text-text-primary mb-0.5">孕15周产检计划</div>
                 <div className="text-[11px] text-text-tertiary">2026年3月18日（周三）</div>
               </div>
-              <button
-                onClick={() => router.push('/checkup')}
+              <Link
+                href="/checkup"
                 className="px-4 py-2 bg-gradient-to-r from-primary-400 to-primary text-white rounded-chip text-xs font-bold shadow-button"
               >
                 记录产检
-              </button>
+              </Link>
             </div>
           </Card>
         </div>
@@ -156,12 +155,12 @@ export default function HomePage() {
         <div className="px-4 mb-5">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-bold text-text-primary">&#128202; 健康记录</span>
-            <button
-              onClick={() => router.push('/health')}
+            <Link
+              href="/health"
               className="text-[11px] text-primary"
             >
               查看趋势 ›
-            </button>
+            </Link>
           </div>
           <HealthQuickCards
             cards={[
@@ -170,7 +169,7 @@ export default function HomePage() {
               { icon: '🩸', iconBg: '#fce4ec', label: '血糖', value: '5.2', unit: 'mmol/L', hint: '空腹正常 ✓', hintType: 'normal', actionText: '+ 记录血糖' },
               { icon: '👶', iconBg: '#e3f2fd', label: '胎动', value: '—', unit: '', hint: '28周后开始记录', hintType: 'disabled', actionText: '暂不可用', disabled: true },
             ]}
-            onCardAction={(label) => router.push('/health')}
+            onCardAction={() => { window.location.href = '/health' }}
           />
         </div>
       </div>
@@ -184,7 +183,7 @@ export default function HomePage() {
         onDismiss={handleDismissMomChange}
         onLearnMore={() => {
           handleDismissMomChange()
-          router.push('/home/knowledge')
+          window.location.href = '/home/knowledge'
         }}
       />
     </div>

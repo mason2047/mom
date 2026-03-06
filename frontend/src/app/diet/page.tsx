@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import NavBar from '@/components/layout/NavBar'
+import TabBar from '@/components/layout/TabBar'
 import FoodReplacementCard, { MOCK_REPLACEMENTS } from '@/components/business/FoodReplacementCard'
 
 /**
@@ -77,7 +78,6 @@ function getModeLabel(selections: Record<number, string[]>): string {
 }
 
 export default function DietPage() {
-  const router = useRouter()
   const [inputText, setInputText] = useState('')
   const [isFirstUse, setIsFirstUse] = useState(true)
   const [surveyStep, setSurveyStep] = useState(0)
@@ -126,11 +126,11 @@ export default function DietPage() {
     <div className="flex flex-col min-h-screen bg-bg">
       <NavBar
         title="饮食健康助手"
-        onBack={() => router.push('/home')}
+        backHref="/home"
         rightContent={
-          <button onClick={() => router.push('/diet/goal')} className="text-[13px] text-teal font-medium">
+          <Link href="/diet/goal" className="text-[13px] text-teal font-medium">
             目标设置
-          </button>
+          </Link>
         }
       />
 
@@ -329,12 +329,22 @@ export default function DietPage() {
                   </div>
                   <div className="px-3 py-1">
                     {MOCK_FOOD.map((food) => (
-                      <div key={food.name} className="flex items-center justify-between py-1.5 border-b border-[#fafaf8] last:border-b-0 text-[13px]">
+                      <div
+                        key={food.name}
+                        className={`flex items-center justify-between py-1.5 border-b border-[#fafaf8] last:border-b-0 text-[13px] ${
+                          food.gi === 'high' ? 'bg-[#fff8f0] -mx-3 px-3 rounded-md' : ''
+                        }`}
+                      >
                         <span className="flex items-center gap-1.5 text-text-primary">
                           {food.name}
                           <span className={`text-[9px] px-1.5 py-0.5 rounded-md font-semibold ${GI_CONFIG[food.gi].className}`}>
                             {GI_CONFIG[food.gi].label}
                           </span>
+                          {food.gi === 'high' && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#fef0f0] text-danger font-semibold">
+                              建议替换
+                            </span>
+                          )}
                         </span>
                         <span className="text-xs text-text-muted">{food.kcal} kcal</span>
                       </div>
@@ -355,6 +365,22 @@ export default function DietPage() {
                       <div className="bg-blue" style={{ width: '58%' }} />
                       <div className="bg-purple" style={{ width: '22%' }} />
                       <div className="bg-green" style={{ width: '20%' }} />
+                    </div>
+                  </div>
+                  {/* High GI replacement suggestion */}
+                  <div className="bg-[#fff8f0] px-3 py-2.5 border-t border-[#ffe8d0]">
+                    <div className="text-xs text-primary font-medium mb-1.5 flex items-center gap-1">
+                      &#9888;&#65039; 白米饭 高GI，建议低GI替换：
+                    </div>
+                    <div className="flex gap-2">
+                      {['黑米饭 (GI56)', '糙米饭 (GI59)', '藜麦 (GI53)'].map((chip) => (
+                        <button
+                          key={chip}
+                          className="px-3 py-1 rounded-chip text-xs border-[1.5px] border-teal/50 text-teal bg-[#f0faf5]"
+                        >
+                          {chip}
+                        </button>
+                      ))}
                     </div>
                   </div>
                   <div className="flex gap-2 px-3 py-2.5">
@@ -392,19 +418,24 @@ export default function DietPage() {
       {/* Input Bar */}
       <div className="flex items-center gap-2 px-3 py-2.5 bg-white border-t border-border">
         <button className="w-10 h-10 rounded-full bg-bg flex items-center justify-center text-lg flex-shrink-0">
-          &#128247;
+          &#127908;
         </button>
         <input
           type="text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          placeholder="输入食物名称或拍照识别..."
+          placeholder="描述你吃了什么，或拍照上传..."
           className="flex-1 h-10 rounded-chip border-[1.5px] border-border-dark px-3.5 text-sm text-text-primary bg-[#fafaf8] outline-none focus:border-teal"
         />
+        <button className="w-10 h-10 rounded-full bg-bg flex items-center justify-center text-lg flex-shrink-0">
+          &#128247;
+        </button>
         <button className="w-10 h-10 rounded-full bg-teal flex items-center justify-center text-lg text-white flex-shrink-0 shadow-[0_2px_8px_rgba(29,200,160,0.35)]">
           &#8593;
         </button>
       </div>
+
+      <TabBar />
     </div>
   )
 }

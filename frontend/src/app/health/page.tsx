@@ -1,7 +1,9 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import Link from 'next/link'
 import NavBar from '@/components/layout/NavBar'
+import TabBar from '@/components/layout/TabBar'
 
 /**
  * P18 - 健康综合看板
@@ -56,13 +58,13 @@ const QUICK_ENTRIES = [
 ]
 
 export default function HealthPage() {
-  const router = useRouter()
+  const [activeChartTab, setActiveChartTab] = useState(0)
 
   return (
     <div className="flex flex-col min-h-screen bg-bg">
       <NavBar
         title="健康记录"
-        onBack={() => router.push('/home')}
+        backHref="/home"
         rightContent={<span className="text-[13px] text-primary font-medium">历史</span>}
       />
 
@@ -73,11 +75,11 @@ export default function HealthPage() {
           <div className="text-[15px] font-semibold text-text-primary mb-4">最近健康数据一览</div>
           <div className="grid grid-cols-2 gap-2.5">
             {DASH_CARDS.map((card) => (
-              <button
+              <Link
                 key={card.label}
-                onClick={() => router.push(card.route)}
-                className={`bg-white rounded-[14px] p-3.5 shadow-card text-left ${
-                  card.abnormal ? 'border-[1.5px] border-[#ffe0e0] border-l-[3px] border-l-danger' : ''
+                href={card.route}
+                className={`bg-white rounded-[14px] p-3.5 shadow-card text-left block ${
+                  card.abnormal ? 'border-[1.5px] border-[#ffe0e0] border-l-[3px] border-l-danger bg-[#fff8f5]' : ''
                 }`}
               >
                 <div className="text-[22px] mb-1.5" dangerouslySetInnerHTML={{ __html: card.icon }} />
@@ -98,7 +100,7 @@ export default function HealthPage() {
                   {card.trendType === 'ok' ? '&#10003; ' : card.trendType === 'warn' ? '&#9888;&#65039; ' : '&#8593; '}
                   {card.trend}
                 </div>
-              </button>
+              </Link>
             ))}
           </div>
         </div>
@@ -107,17 +109,18 @@ export default function HealthPage() {
         <div className="p-4">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[15px] font-semibold text-text-primary">&#9878;&#65039; 体重趋势</span>
-            <button onClick={() => router.push('/health/weight')} className="text-xs text-primary">
+            <Link href="/health/weight" className="text-xs text-primary">
               全部记录 &#8250;
-            </button>
+            </Link>
           </div>
           <div className="bg-white rounded-card p-4 shadow-card">
             <div className="flex gap-1.5 mb-3.5">
               {['近2周', '近1月', '全孕期'].map((tab, i) => (
                 <button
                   key={tab}
-                  className={`px-3 py-1 rounded-chip text-xs ${
-                    i === 0 ? 'bg-primary text-white font-medium' : 'bg-bg text-text-muted'
+                  onClick={() => setActiveChartTab(i)}
+                  className={`px-3 py-1 rounded-chip text-xs transition-colors ${
+                    activeChartTab === i ? 'bg-primary text-white font-medium' : 'bg-bg text-text-muted'
                   }`}
                 >
                   {tab}
@@ -190,18 +193,20 @@ export default function HealthPage() {
           </div>
           <div className="flex gap-2">
             {QUICK_ENTRIES.map((entry) => (
-              <button
+              <Link
                 key={entry.label}
-                onClick={() => router.push(entry.route)}
+                href={entry.route}
                 className="flex-1 bg-white rounded-[12px] p-3 text-center shadow-card active:scale-[0.96] transition-transform"
               >
                 <div className="text-[22px] mb-1" dangerouslySetInnerHTML={{ __html: entry.icon }} />
                 <div className="text-[11px] text-text-secondary">{entry.label}</div>
-              </button>
+              </Link>
             ))}
           </div>
         </div>
       </div>
+
+      <TabBar />
     </div>
   )
 }

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import NavBar from '@/components/layout/NavBar'
 
 /**
@@ -10,7 +9,6 @@ import NavBar from '@/components/layout/NavBar'
  */
 
 export default function ProfileEditPage() {
-  const router = useRouter()
   const [nickname, setNickname] = useState('小明妈妈')
   const [lmpDate, setLmpDate] = useState('2025-11-25')
   const [weight, setWeight] = useState('55')
@@ -19,12 +17,12 @@ export default function ProfileEditPage() {
 
   const handleSave = () => {
     // TODO: profileApi.updateProfile
-    router.back()
+    window.location.href = '/profile'
   }
 
   return (
     <div className="flex flex-col min-h-screen bg-bg">
-      <NavBar title="个人信息" onBack={() => router.back()} />
+      <NavBar title="个人信息" backHref="/profile" />
 
       <div className="flex-1 overflow-y-auto hide-scrollbar">
         {/* Avatar */}

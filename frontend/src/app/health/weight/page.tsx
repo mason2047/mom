@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import NavBar from '@/components/layout/NavBar'
+import LargeNumberInput from '@/components/ui/LargeNumberInput'
 
 /**
  * P13 - 体重管理页
@@ -16,7 +16,6 @@ const MOCK_RECORDS = [
 ]
 
 export default function WeightPage() {
-  const router = useRouter()
   const [weight, setWeight] = useState('58.4')
   const [activeTab, setActiveTab] = useState(0)
 
@@ -26,7 +25,7 @@ export default function WeightPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg">
-      <NavBar title="体重管理" onBack={() => router.back()} />
+      <NavBar title="体重管理" backHref="/health" />
 
       <div className="flex-1 overflow-y-auto hide-scrollbar">
         {/* Stats Row */}
@@ -131,18 +130,22 @@ export default function WeightPage() {
         <div className="bg-white mx-4 my-3 rounded-card p-4 shadow-card">
           <div className="text-base font-semibold text-text-primary mb-1">记录今日体重</div>
           <div className="text-xs text-text-muted mb-4">孕14周3天 · 3月15日</div>
-          <div className="flex items-baseline justify-center gap-2 my-4">
-            <input
-              type="number"
-              className="text-5xl font-bold text-primary bg-transparent border-none outline-none text-center w-40"
+          <div className="flex justify-center my-4">
+            <LargeNumberInput
               value={weight}
-              onChange={(e) => setWeight(e.target.value)}
-              step="0.1"
+              onChange={setWeight}
+              unit="kg"
+              className="max-w-[200px]"
             />
-            <span className="text-lg text-text-muted font-medium">kg</span>
           </div>
+          {/* BMI 计算提示 */}
+          <div className="bg-[#fff8f3] rounded-input p-3 text-xs text-[#a06030] leading-relaxed mb-2.5 border border-[#ffe8d0]">
+            BMI = {weight ? (parseFloat(weight) / (1.65 * 1.65)).toFixed(1) : '--'}（孕前 20.2 正常）
+          </div>
+          {/* 增重建议区间 */}
           <div className="bg-bg rounded-input p-3 text-xs text-text-secondary leading-relaxed mb-3.5">
-            &#128204; 孕14周推荐增重：2.0~4.0 kg · 当前 +3.4 kg &#10003; 在正常范围内
+            &#128204; 孕14周推荐增重：<strong>2.0~4.0 kg</strong> · 当前 +3.4 kg &#10003; 在正常范围内<br />
+            全孕期建议增重：<strong>11.5~16 kg</strong>（基于孕前BMI 20.2）
           </div>
           <button onClick={handleSave} className="btn-primary">
             保存记录

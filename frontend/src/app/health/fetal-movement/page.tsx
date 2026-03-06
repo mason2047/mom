@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
 import NavBar from '@/components/layout/NavBar'
 
 /**
@@ -16,7 +15,6 @@ const MOCK_HISTORY = [
 ]
 
 export default function FetalMovementPage() {
-  const router = useRouter()
   const [count, setCount] = useState(7)
   const [elapsedSeconds, setElapsedSeconds] = useState(42 * 60 + 18)
   const [isRunning, setIsRunning] = useState(true)
@@ -34,8 +32,12 @@ export default function FetalMovementPage() {
   }, [isRunning])
 
   const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60)
+    const h = Math.floor(seconds / 3600)
+    const m = Math.floor((seconds % 3600) / 60)
     const s = seconds % 60
+    if (h > 0) {
+      return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+    }
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
   }
 
@@ -47,15 +49,16 @@ export default function FetalMovementPage() {
     <div className="flex flex-col min-h-screen bg-bg">
       <NavBar
         title="胎动计数"
-        onBack={() => router.back()}
+        backHref="/health"
         rightContent={<span className="text-[13px] text-primary font-medium">历史</span>}
       />
 
       <div className="flex-1 overflow-y-auto hide-scrollbar">
         {/* Hero */}
         <div className="bg-gradient-to-br from-[#f0f8ff] to-[#e8f4ff] px-5 py-6 text-center border-b border-[#e0ecff]">
-          <div className="text-[13px] text-blue mb-2">
-            今日 · 10:00~11:00 · 计时中 {formatTime(elapsedSeconds)}
+          <div className="text-[13px] text-blue mb-2 flex items-center justify-center gap-1.5">
+            <span>今日 · 10:00~11:00 · 计时中</span>
+            <span className="font-mono font-semibold bg-blue/10 px-2 py-0.5 rounded-lg">{formatTime(elapsedSeconds)}</span>
           </div>
           <div className="text-[56px] font-extrabold text-blue leading-none">{count}</div>
           <div className="text-[13px] text-[#8aabf0] mt-1 mb-4">本小时胎动次数</div>
@@ -118,7 +121,16 @@ export default function FetalMovementPage() {
             </div>
           </div>
         ))}
-        <div className="h-4" />
+
+        {/* End Count Button */}
+        <div className="px-4 py-4">
+          <button
+            onClick={() => setIsRunning(false)}
+            className="w-full h-[46px] rounded-[12px] bg-[#fff3eb] text-primary text-sm font-semibold"
+          >
+            结束本次计数
+          </button>
+        </div>
       </div>
     </div>
   )
