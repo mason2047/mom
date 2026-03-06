@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>产检日历 · MOM孕期助手</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue',sans-serif;background:#f5f1ec;color:#333;}
+  :root{--orange:#FF8C42;--green:#4CAF7D;--red:#E05252;--blue:#5B8BF5;--gray:#999;--bg:#f5f1ec;--white:#fff;--card-r:16px;}
+
+  /* ===== PHONE FRAME ===== */
+  .demo{display:flex;gap:28px;padding:40px;background:#e8e0d8;min-height:100vh;align-items:flex-start;flex-wrap:wrap;}
+  .phone{width:375px;min-height:812px;background:#f5f1ec;border-radius:44px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.22);position:relative;flex-shrink:0;}
+  .phone-inner{width:375px;height:812px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;}
+  .phone-inner::-webkit-scrollbar{display:none;}
+  .label{font-size:13px;color:#888;text-align:center;margin-top:12px;font-weight:500;}
+
+  /* ===== STATUS BAR ===== */
+  .status-bar{height:44px;background:var(--white);display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:100;}
+  .status-time{font-size:15px;font-weight:600;}
+  .status-icons{display:flex;gap:6px;align-items:center;font-size:12px;}
+
+  /* ===== NAV BAR ===== */
+  .nav-bar{height:52px;background:var(--white);display:flex;align-items:center;padding:0 16px;border-bottom:1px solid #f0ebe4;gap:12px;position:sticky;top:44px;z-index:99;}
+  .nav-back{width:32px;height:32px;border-radius:50%;background:#f5f1ec;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;}
+  .nav-title{flex:1;font-size:17px;font-weight:600;color:#1a1a1a;text-align:center;}
+  .nav-right{font-size:13px;color:var(--orange);font-weight:500;}
+
+  /* ===== VIEW TOGGLE ===== */
+  .view-toggle{display:flex;background:var(--white);padding:12px 16px;gap:8px;border-bottom:1px solid #f0ebe4;}
+  .toggle-btn{flex:1;height:34px;border-radius:20px;border:1.5px solid #e0d8d0;background:var(--white);font-size:13px;color:#666;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;}
+  .toggle-btn.active{background:var(--orange);border-color:var(--orange);color:var(--white);}
+
+  /* ===== MONTH NAV ===== */
+  .month-nav{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 8px;background:var(--white);}
+  .month-label{font-size:16px;font-weight:700;color:#1a1a1a;}
+  .month-arrow{width:32px;height:32px;border-radius:50%;background:#f5f1ec;display:flex;align-items:center;justify-content:center;font-size:15px;color:#666;cursor:pointer;}
+
+  /* ===== CALENDAR ===== */
+  .calendar{background:var(--white);padding:0 12px 16px;}
+  .cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px;}
+  .cal-weekday{text-align:center;font-size:11px;color:#aaa;padding:6px 0;font-weight:500;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+  .cal-day{aspect-ratio:1;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;font-size:13px;color:#333;font-weight:400;}
+  .cal-day.other-month{color:#ccc;}
+  .cal-day.today{background:#fff3eb;font-weight:700;color:var(--orange);}
+  .cal-day.has-checkup{font-weight:600;}
+  .cal-day-dot{width:5px;height:5px;border-radius:50%;margin-top:1px;}
+  .dot-done{background:var(--green);}
+  .dot-pending{background:var(--blue);}
+  .dot-overdue{background:var(--red);}
+  .cal-day.selected{background:var(--orange);color:var(--white);}
+  .cal-day.selected .cal-day-dot{background:rgba(255,255,255,.8);}
+
+  /* ===== LEGEND ===== */
+  .legend{display:flex;gap:16px;padding:10px 20px 12px;background:var(--white);border-bottom:1px solid #f0ebe4;}
+  .legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#888;}
+  .legend-dot{width:8px;height:8px;border-radius:50%;}
+
+  /* ===== SECTION ===== */
+  .section{padding:16px;}
+  .section-title{font-size:13px;color:#999;font-weight:500;margin-bottom:10px;padding-left:2px;}
+
+  /* ===== CHECKUP CARD ===== */
+  .checkup-card{background:var(--white);border-radius:var(--card-r);padding:16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+  .card-top{display:flex;align-items:flex-start;gap:12px;}
+  .card-status-dot{width:10px;height:10px;border-radius:50%;margin-top:4px;flex-shrink:0;}
+  .status-done{background:var(--green);}
+  .status-pending{background:var(--blue);}
+  .status-overdue{background:var(--red);}
+  .card-info{flex:1;}
+  .card-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+  .card-title{font-size:15px;font-weight:600;color:#1a1a1a;}
+  .card-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500;}
+  .badge-done{background:#e8f5ee;color:var(--green);}
+  .badge-pending{background:#eef2ff;color:var(--blue);}
+  .badge-overdue{background:#fef0f0;color:var(--red);}
+  .card-week{font-size:12px;color:#aaa;margin-bottom:6px;}
+  .card-items{display:flex;flex-wrap:wrap;gap:5px;}
+  .card-item-tag{font-size:11px;background:#f5f1ec;color:#666;padding:3px 8px;border-radius:6px;}
+  .card-actions{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid #f5f1ec;}
+  .card-btn{flex:1;height:34px;border-radius:8px;border:none;font-size:13px;font-weight:500;cursor:pointer;}
+  .btn-outline{background:var(--white);border:1.5px solid #e0d8d0;color:#555;}
+  .btn-primary{background:var(--orange);color:var(--white);}
+  .btn-ghost{background:#eef2ff;color:var(--blue);border:none;}
+
+  /* ===== PROGRESS BAR ===== */
+  .progress-banner{background:var(--white);margin:0 0 12px;border-radius:var(--card-r);padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+  .progress-title{font-size:13px;color:#666;margin-bottom:8px;}
+  .progress-nums{display:flex;justify-content:space-between;font-size:12px;color:#aaa;margin-bottom:6px;}
+  .progress-bar{height:8px;background:#f0ebe4;border-radius:6px;overflow:hidden;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--green),#7dd4a8);border-radius:6px;}
+  .progress-label{font-size:11px;color:#aaa;margin-top:6px;text-align:right;}
+
+  /* ===== EMPTY STATE ===== */
+  .empty{text-align:center;padding:40px 20px;color:#bbb;font-size:13px;}
+  .empty-icon{font-size:40px;margin-bottom:12px;}
+
+  /* ===== TAB BAR ===== */
+  .tab-bar{height:56px;background:var(--white);display:flex;border-top:1px solid #f0ebe4;position:sticky;bottom:0;}
+  .tab-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;}
+  .tab-icon{font-size:22px;}
+  .tab-text{font-size:10px;color:#bbb;}
+  .tab-item.active .tab-text{color:var(--orange);}
+
+  /* ===== DETAIL PAGE ===== */
+  .detail-hero{background:linear-gradient(135deg,#fff6f0,#fff);padding:20px;border-bottom:1px solid #f0ebe4;}
+  .detail-badge-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .detail-badge{font-size:11px;padding:3px 10px;border-radius:10px;font-weight:500;}
+  .detail-week{font-size:13px;color:#aaa;}
+  .detail-name{font-size:20px;font-weight:700;color:#1a1a1a;margin-bottom:4px;}
+  .detail-date{font-size:13px;color:#888;display:flex;align-items:center;gap:4px;}
+  .detail-section{background:var(--white);margin:12px 16px;border-radius:var(--card-r);padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+  .detail-section-title{font-size:13px;font-weight:600;color:#333;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+  .item-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #f9f5f0;}
+  .item-row:last-child{border-bottom:none;}
+  .item-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+  .item-body{flex:1;}
+  .item-title{font-size:14px;font-weight:500;color:#1a1a1a;margin-bottom:3px;}
+  .item-desc{font-size:12px;color:#888;line-height:1.5;}
+  .tip-box{background:#fff8f3;border-left:3px solid var(--orange);border-radius:8px;padding:12px;margin-top:12px;}
+  .tip-text{font-size:12px;color:#a06030;line-height:1.6;}
+  .bring-list{display:flex;flex-direction:column;gap:8px;}
+  .bring-item{display:flex;align-items:center;gap:8px;font-size:13px;color:#555;}
+  .check-box{width:16px;height:16px;border-radius:4px;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .check-box.empty-cb{background:#f0ebe4;}
+  .detail-action-bar{display:flex;gap:10px;padding:16px;background:var(--white);border-top:1px solid #f0ebe4;position:sticky;bottom:0;}
+  .detail-btn{flex:1;height:46px;border-radius:12px;border:none;font-size:15px;font-weight:600;cursor:pointer;}
+
+  /* ===== RECORD FORM ===== */
+  .form-section{background:var(--white);margin:12px 16px;border-radius:var(--card-r);padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+  .form-title{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:16px;}
+  .form-row{margin-bottom:16px;}
+  .form-label{font-size:13px;color:#666;margin-bottom:6px;font-weight:500;}
+  .form-input{width:100%;height:44px;border-radius:10px;border:1.5px solid #e8e2da;padding:0 14px;font-size:14px;color:#333;background:#fafaf8;outline:none;}
+  .form-input:focus{border-color:var(--orange);}
+  .form-input.filled{border-color:#d0c8c0;background:var(--white);}
+  .form-textarea{width:100%;height:80px;border-radius:10px;border:1.5px solid #e8e2da;padding:10px 14px;font-size:14px;color:#333;background:#fafaf8;outline:none;resize:none;line-height:1.5;}
+  .form-hint{font-size:11px;color:#bbb;margin-top:4px;}
+  .radio-group{display:flex;gap:8px;flex-wrap:wrap;}
+  .radio-btn{padding:6px 14px;border-radius:20px;border:1.5px solid #e0d8d0;font-size:13px;color:#666;cursor:pointer;}
+  .radio-btn.active{background:var(--orange);border-color:var(--orange);color:var(--white);}
+  .upload-area{border:2px dashed #e0d8d0;border-radius:12px;padding:20px;text-align:center;color:#bbb;font-size:13px;cursor:pointer;}
+  .upload-area:active{background:#f9f5f0;}
+  .upload-icon{font-size:30px;margin-bottom:6px;}
+  .submit-bar{padding:16px;background:var(--white);border-top:1px solid #f0ebe4;position:sticky;bottom:0;}
+  .submit-btn{width:100%;height:50px;border-radius:14px;background:var(--orange);border:none;color:var(--white);font-size:16px;font-weight:600;cursor:pointer;}
+  .tag-list{display:flex;flex-wrap:wrap;gap:8px;}
+  .tag-item{padding:6px 14px;border-radius:20px;border:1.5px solid #e0d8d0;font-size:12px;color:#666;cursor:pointer;}
+  .tag-item.selected{background:#eef2ff;border-color:var(--blue);color:var(--blue);}
+
+  /* ===== NOTIFY SETTING ===== */
+  .notify-card{background:var(--white);margin:0 16px 12px;border-radius:var(--card-r);padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+  .notify-icon{font-size:24px;}
+  .notify-body{flex:1;}
+  .notify-title{font-size:14px;font-weight:500;color:#1a1a1a;}
+  .notify-sub{font-size:12px;color:#aaa;margin-top:2px;}
+  .toggle-switch{width:44px;height:24px;background:var(--green);border-radius:12px;position:relative;cursor:pointer;flex-shrink:0;}
+  .toggle-knob{width:20px;height:20px;background:var(--white);border-radius:50%;position:absolute;top:2px;right:2px;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+  .toggle-switch.off{background:#e0d8d0;}
+  .toggle-switch.off .toggle-knob{right:auto;left:2px;}
+</style>
+</head>
+<body>
+<div class="demo">
+
+  <!-- ============ P06: 产检日历页 ============ -->
+  <div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">📶 🔋</div>
+      </div>
+      <div class="nav-bar">
+        <div class="nav-back" onclick="location.href='home-tab.html'" style="cursor:pointer;">‹</div>
+        <div class="nav-title">产检计划</div>
+        <div class="nav-right">+ 添加</div>
+      </div>
+
+      <!-- View Toggle -->
+      <div class="view-toggle">
+        <button class="toggle-btn active">📅 月历视图</button>
+        <button class="toggle-btn">📋 清单视图</button>
+      </div>
+
+      <!-- Month Nav + Calendar -->
+      <div class="month-nav">
+        <div class="month-arrow">‹</div>
+        <div class="month-label">2026年 3月</div>
+        <div class="month-arrow">›</div>
+      </div>
+      <div class="calendar">
+        <div class="cal-weekdays">
+          <div class="cal-weekday">日</div><div class="cal-weekday">一</div>
+          <div class="cal-weekday">二</div><div class="cal-weekday">三</div>
+          <div class="cal-weekday">四</div><div class="cal-weekday">五</div>
+          <div class="cal-weekday">六</div>
+        </div>
+        <div class="cal-grid">
+          <div class="cal-day other-month">23</div><div class="cal-day other-month">24</div>
+          <div class="cal-day other-month">25</div><div class="cal-day other-month">26</div>
+          <div class="cal-day other-month">27</div><div class="cal-day other-month">28</div>
+          <div class="cal-day">1</div>
+          <div class="cal-day">2</div><div class="cal-day">3</div>
+          <div class="cal-day">4</div><div class="cal-day">5</div>
+          <div class="cal-day">6</div>
+          <div class="cal-day has-checkup done">7<div class="cal-day-dot dot-done"></div></div>
+          <div class="cal-day">8</div>
+          <div class="cal-day">9</div>
+          <div class="cal-day">10</div>
+          <div class="cal-day">11</div>
+          <div class="cal-day">12</div>
+          <div class="cal-day has-checkup pending selected">13<div class="cal-day-dot" style="background:rgba(255,255,255,.8)"></div></div>
+          <div class="cal-day">14</div>
+          <div class="cal-day today">15</div>
+          <div class="cal-day">16</div><div class="cal-day">17</div>
+          <div class="cal-day">18</div><div class="cal-day">19</div>
+          <div class="cal-day">20</div>
+          <div class="cal-day">21</div>
+          <div class="cal-day">22</div><div class="cal-day">23</div>
+          <div class="cal-day">24</div><div class="cal-day">25</div>
+          <div class="cal-day has-checkup pending">26<div class="cal-day-dot dot-pending"></div></div>
+          <div class="cal-day">27</div>
+          <div class="cal-day">28</div>
+          <div class="cal-day">29</div><div class="cal-day">30</div>
+          <div class="cal-day">31</div>
+          <div class="cal-day other-month">1</div>
+          <div class="cal-day other-month">2</div><div class="cal-day other-month">3</div>
+          <div class="cal-day other-month">4</div>
+        </div>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>已完成</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>待产检</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>已逾期</div>
+        <div class="legend-item">🔴 今日</div>
+      </div>
+
+      <!-- Selected Day Detail -->
+      <div class="section">
+        <div class="section-title">3月13日 · 孕14周3天</div>
+        <div class="progress-banner">
+          <div class="progress-title">整体产检进度</div>
+          <div class="progress-nums"><span>已完成 3次</span><span>共 11次</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:27%"></div></div>
+          <div class="progress-label">还剩 8次 产检</div>
+        </div>
+
+        <!-- Card 1 - Done -->
+        <div class="checkup-card">
+          <div class="card-top">
+            <div class="card-status-dot status-done"></div>
+            <div class="card-info">
+              <div class="card-title-row">
+                <div class="card-title">第2次产检</div>
+                <div class="card-badge badge-done">✓ 已完成</div>
+              </div>
+              <div class="card-week">孕14~19+6周 · 已于 3月13日 完成</div>
+              <div class="card-items">
+                <div class="card-item-tag">唐氏筛查（中期）</div>
+                <div class="card-item-tag">血常规</div>
+                <div class="card-item-tag">尿常规</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-actions">
+            <button class="card-btn btn-outline">查看记录</button>
+            <button class="card-btn btn-ghost" onclick="location.href='mom-assistant.html'">AI解读报告</button>
+          </div>
+        </div>
+
+        <!-- Card 2 - Pending -->
+        <div class="checkup-card" style="border:1.5px solid #e8edff;">
+          <div class="card-top">
+            <div class="card-status-dot status-pending"></div>
+            <div class="card-info">
+              <div class="card-title-row">
+                <div class="card-title">第3次产检</div>
+                <div class="card-badge badge-pending">待产检</div>
+              </div>
+              <div class="card-week">孕20~24周 · 预计 3月26日</div>
+              <div class="card-items">
+                <div class="card-item-tag">大排畸超声（Ⅱ级）</div>
+                <div class="card-item-tag">血常规</div>
+                <div class="card-item-tag">尿常规</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-actions">
+            <button class="card-btn btn-outline">查看详情</button>
+            <button class="card-btn btn-primary">记录产检</button>
+          </div>
+        </div>
+
+        <!-- Notify Setting -->
+        <div class="notify-card">
+          <div class="notify-icon">🔔</div>
+          <div class="notify-body">
+            <div class="notify-title">产检提醒</div>
+            <div class="notify-sub">提前3天 · 3月23日 09:00</div>
+          </div>
+          <div class="toggle-switch"><div class="toggle-knob"></div></div>
+        </div>
+      </div>
+
+      <div class="tab-bar">
+        <div class="tab-item active" onclick="location.href='home-tab.html'" style="cursor:pointer;"><div class="tab-icon">🏠</div><div class="tab-text" style="color:var(--orange)">首页</div></div>
+        <div class="tab-item" onclick="location.href='mom-assistant.html'" style="cursor:pointer;"><div class="tab-icon">🤖</div><div class="tab-text">MOM助手</div></div>
+        <div class="tab-item" onclick="location.href='my-profile.html'" style="cursor:pointer;"><div class="tab-icon">👤</div><div class="tab-text">我的</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="label">P06 · 产检日历页</div>
+  </div>
+
+  <!-- ============ P07: 产检详情页 ============ -->
+  <div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">📶 🔋</div>
+      </div>
+      <div class="nav-bar">
+        <div class="nav-back" onclick="location.href='home-tab.html'" style="cursor:pointer;">‹</div>
+        <div class="nav-title">产检详情</div>
+        <div class="nav-right">···</div>
+      </div>
+
+      <!-- Hero -->
+      <div class="detail-hero">
+        <div class="detail-badge-row">
+          <div class="detail-badge badge-pending">第3次产检</div>
+          <div class="detail-week">孕20~24周</div>
+        </div>
+        <div class="detail-name">大排畸超声检查</div>
+        <div class="detail-date">📅 预计产检时间：2026年3月26日（周四）</div>
+      </div>
+
+      <!-- 检查项目 -->
+      <div class="detail-section">
+        <div class="detail-section-title">📋 本次检查项目</div>
+        <div class="item-row">
+          <div class="item-icon">🔬</div>
+          <div class="item-body">
+            <div class="item-title">大排畸超声（Ⅱ级/Ⅲ级）</div>
+            <div class="item-desc">系统排查胎儿重大结构性异常，包括心脏、脑部、脊柱、四肢等器官发育情况，是孕期最重要的超声检查之一。</div>
+          </div>
+        </div>
+        <div class="item-row">
+          <div class="item-icon">🩸</div>
+          <div class="item-body">
+            <div class="item-title">血常规</div>
+            <div class="item-desc">检测血红蛋白、白细胞、血小板等指标，排查贫血及感染。</div>
+          </div>
+        </div>
+        <div class="item-row">
+          <div class="item-icon">🧪</div>
+          <div class="item-body">
+            <div class="item-title">尿常规</div>
+            <div class="item-desc">检测尿蛋白、尿糖等，监测肾功能和妊娠糖尿病风险。</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 注意事项 -->
+      <div class="detail-section">
+        <div class="detail-section-title">⚠️ 注意事项</div>
+        <div class="tip-box">
+          <div class="tip-text">
+            🌸 <strong>排畸超声重点提醒：</strong><br><br>
+            · 建议穿着宽松、容易掀开腹部的衣物<br>
+            · 胎儿配合度影响检查时长，部分孕妇需等待30~60分钟<br>
+            · 检查前适量饮水（非空腹），保持轻松心情<br><br>
+            · 血常规+尿常规 <strong>无需空腹</strong>，检查顺序灵活
+          </div>
+        </div>
+      </div>
+
+      <!-- 需要携带 -->
+      <div class="detail-section">
+        <div class="detail-section-title">📦 记得带上</div>
+        <div class="bring-list">
+          <div class="bring-item"><div class="check-box">✓</div>产检手册/母婴健康手册</div>
+          <div class="bring-item"><div class="check-box">✓</div>身份证 + 医保卡</div>
+          <div class="bring-item"><div class="check-box">✓</div>上次产检报告单</div>
+          <div class="bring-item"><div class="check-box empty-cb"></div>宽松上衣（方便检查）</div>
+          <div class="bring-item"><div class="check-box empty-cb"></div>一瓶水（排畸后可饮用）</div>
+        </div>
+      </div>
+
+      <!-- 提醒设置 -->
+      <div class="detail-section">
+        <div class="detail-section-title">🔔 提醒设置</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-size:13px;color:#555;">提前3天提醒（3月23日）</div>
+            <div class="toggle-switch"><div class="toggle-knob"></div></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-size:13px;color:#555;">提前1天提醒（3月25日）</div>
+            <div class="toggle-switch"><div class="toggle-knob"></div></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-size:13px;color:#555;">当天早晨提醒（07:30）</div>
+            <div class="toggle-switch off"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:80px;"></div>
+      <div class="detail-action-bar">
+        <button class="detail-btn btn-outline" style="border:1.5px solid #e0d8d0;color:#555;">修改时间</button>
+        <button class="detail-btn btn-primary" style="background:var(--orange);color:var(--white);">记录产检结果</button>
+      </div>
+    </div>
+  </div>
+  <div class="label">P07 · 产检详情页</div>
+  </div>
+
+  <!-- ============ P08: 产检记录填写页 ============ -->
+  <div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">📶 🔋</div>
+      </div>
+      <div class="nav-bar">
+        <div class="nav-back" onclick="location.href='home-tab.html'" style="cursor:pointer;">‹</div>
+        <div class="nav-title">记录产检结果</div>
+        <div class="nav-right"></div>
+      </div>
+
+      <!-- 基础信息 -->
+      <div class="form-section" style="margin-top:12px;">
+        <div class="form-title">📋 基础信息</div>
+        <div class="form-row">
+          <div class="form-label">产检名称</div>
+          <input class="form-input filled" value="第3次产检 · 大排畸超声" readonly>
+        </div>
+        <div class="form-row">
+          <div class="form-label">实际产检日期</div>
+          <input class="form-input" placeholder="请选择日期" value="2026年3月26日">
+        </div>
+        <div class="form-row">
+          <div class="form-label">就诊医院</div>
+          <input class="form-input" value="北京妇产医院" placeholder="请输入医院名称">
+        </div>
+        <div class="form-row">
+          <div class="form-label">产检结果</div>
+          <div class="radio-group">
+            <div class="radio-btn active">一切正常 ✓</div>
+            <div class="radio-btn">有指标异常</div>
+            <div class="radio-btn">需要复查</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 检查项目打卡 -->
+      <div class="form-section">
+        <div class="form-title">✅ 完成检查项目</div>
+        <div class="tag-list">
+          <div class="tag-item selected">大排畸超声</div>
+          <div class="tag-item selected">血常规</div>
+          <div class="tag-item selected">尿常规</div>
+          <div class="tag-item">血压测量</div>
+          <div class="tag-item">体重测量</div>
+        </div>
+        <div class="form-hint" style="margin-top:10px;">点击选中本次已完成的检查项目</div>
+      </div>
+
+      <!-- 上传报告 -->
+      <div class="form-section">
+        <div class="form-title">📄 上传检查报告</div>
+        <div style="display:flex;gap:10px;margin-bottom:10px;">
+          <div style="width:70px;height:70px;border-radius:10px;background:#e8f5ee;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:var(--green);">
+            <div style="font-size:20px;">🩸</div>血常规
+          </div>
+          <div style="width:70px;height:70px;border-radius:10px;background:#e8f5ee;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:var(--green);">
+            <div style="font-size:20px;">🧪</div>尿常规
+          </div>
+          <div style="width:70px;height:70px;border-radius:10px;background:#f0ebe4;border:2px dashed #d0c8c0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:20px;color:#ccc;cursor:pointer;">+</div>
+        </div>
+        <div class="form-hint">拍照或从相册选择，上传后AI自动解读报告指标</div>
+      </div>
+
+      <!-- 医生嘱咐 -->
+      <div class="form-section">
+        <div class="form-title">💬 医生嘱咐 / 备注</div>
+        <textarea class="form-textarea" placeholder="记录本次产检医生的建议、下次产检注意事项等…">宝宝发育正常，各项指标在参考范围内。下次产检孕24-28周，需做糖耐量试验，提前空腹8小时。</textarea>
+      </div>
+
+      <div class="submit-bar">
+        <button class="submit-btn">保存产检记录</button>
+      </div>
+    </div>
+  </div>
+  <div class="label">P08 · 产检记录填写页</div>
+  </div>
+
+</div>
+</body>
+</html>

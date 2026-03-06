@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>引导与建档 · MOM孕期助手</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue',sans-serif;background:#e8e0d8;color:#333;}
+  :root{--orange:#FF8C42;--green:#4CAF7D;--bg:#f5f1ec;--white:#fff;--card-r:16px;}
+
+  .demo{display:flex;gap:28px;padding:40px;background:#e8e0d8;min-height:100vh;align-items:flex-start;flex-wrap:wrap;}
+  .phone{width:375px;min-height:812px;background:var(--bg);border-radius:44px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.22);position:relative;flex-shrink:0;}
+  .phone-inner{width:375px;height:812px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;display:flex;flex-direction:column;}
+  .phone-inner::-webkit-scrollbar{display:none;}
+  .label{font-size:13px;color:#888;text-align:center;margin-top:12px;font-weight:500;}
+
+  .status-bar{height:44px;background:transparent;display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:100;}
+  .status-time{font-size:15px;font-weight:600;}
+  .status-icons{font-size:12px;}
+  .nav-bar{height:52px;background:var(--white);display:flex;align-items:center;padding:0 16px;border-bottom:1px solid #f0ebe4;gap:12px;position:sticky;top:44px;z-index:99;}
+  .nav-back{width:32px;height:32px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:16px;}
+  .nav-title{flex:1;font-size:17px;font-weight:600;color:#1a1a1a;text-align:center;}
+
+  /* ===== P01 SPLASH ===== */
+  .splash{width:375px;height:812px;background:linear-gradient(160deg,#FFF3E8 0%,#FFE8D0 40%,#F5EAF0 100%);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:60px 32px 48px;}
+  .splash-top{text-align:center;}
+  .splash-logo{width:72px;height:72px;border-radius:22px;background:linear-gradient(135deg,#FF8C42,#FF6030);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 16px;box-shadow:0 8px 24px rgba(255,140,66,.35);}
+  .splash-brand{font-size:28px;font-weight:800;color:#1a1a1a;letter-spacing:1px;margin-bottom:6px;}
+  .splash-slogan{font-size:15px;color:#888;font-weight:400;}
+  .splash-illus{font-size:90px;line-height:1;margin:8px 0;}
+  .splash-features{display:flex;flex-direction:column;gap:10px;width:100%;margin-bottom:8px;}
+  .feature-row{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.6);border-radius:12px;padding:10px 14px;backdrop-filter:blur(4px);}
+  .feature-icon{font-size:20px;width:36px;text-align:center;}
+  .feature-text{font-size:13px;color:#555;font-weight:500;}
+  .splash-btn{width:100%;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--orange),#FF6030);border:none;color:#fff;font-size:17px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(255,140,66,.4);letter-spacing:.5px;}
+  .splash-login{font-size:13px;color:#aaa;text-align:center;margin-top:12px;}
+  .splash-login span{color:var(--orange);}
+
+  /* ===== P01-WECHAT ===== */
+  .wechat-modal{position:absolute;bottom:0;left:0;right:0;background:var(--white);border-radius:20px 20px 0 0;padding:24px 24px 36px;box-shadow:0 -4px 20px rgba(0,0,0,.1);}
+  .modal-handle{width:36px;height:4px;background:#e0d8d0;border-radius:2px;margin:0 auto 20px;}
+  .wechat-logo{width:56px;height:56px;border-radius:16px;background:#07c160;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 12px;}
+  .wechat-title{font-size:18px;font-weight:700;color:#1a1a1a;text-align:center;margin-bottom:6px;}
+  .wechat-sub{font-size:13px;color:#888;text-align:center;margin-bottom:20px;line-height:1.5;}
+  .wechat-btn{width:100%;height:50px;border-radius:14px;background:#07c160;border:none;color:#fff;font-size:16px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;}
+  .wechat-skip{width:100%;height:44px;border-radius:14px;background:var(--bg);border:none;color:#888;font-size:14px;cursor:pointer;}
+  .privacy-text{font-size:11px;color:#bbb;text-align:center;margin-top:12px;line-height:1.5;}
+  .privacy-link{color:var(--orange);}
+
+  /* ===== P02 ONBOARDING ===== */
+  .onboard-hero{background:linear-gradient(135deg,#fff8f0,#fff0e8);padding:24px 20px 20px;text-align:center;border-bottom:1px solid #f0ebe4;}
+  .onboard-step{display:flex;justify-content:center;gap:6px;margin-bottom:16px;}
+  .step-dot{width:8px;height:8px;border-radius:50%;background:#e0d8d0;}
+  .step-dot.active{width:20px;border-radius:4px;background:var(--orange);}
+  .onboard-illus{font-size:64px;margin-bottom:12px;}
+  .onboard-title{font-size:20px;font-weight:700;color:#1a1a1a;margin-bottom:6px;}
+  .onboard-sub{font-size:13px;color:#888;line-height:1.6;}
+
+  /* ===== FORM ===== */
+  .form-section{background:var(--white);margin:12px 16px;border-radius:var(--card-r);padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+  .form-title{font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:14px;}
+  .form-row{margin-bottom:14px;}
+  .form-label{font-size:13px;color:#666;margin-bottom:6px;font-weight:500;display:flex;justify-content:space-between;}
+  .form-required{color:var(--orange);font-size:11px;}
+  .form-input{width:100%;height:44px;border-radius:10px;border:1.5px solid #e8e2da;padding:0 14px;font-size:14px;color:#333;background:#fafaf8;outline:none;}
+  .form-input.filled{border-color:var(--orange);background:var(--white);}
+  .form-input-row{display:flex;gap:8px;}
+  .form-input-unit{display:flex;align-items:center;padding-left:8px;font-size:13px;color:#aaa;white-space:nowrap;}
+  .radio-row{display:flex;gap:8px;flex-wrap:wrap;}
+  .radio-chip{padding:7px 14px;border-radius:20px;border:1.5px solid #e0d8d0;font-size:12px;color:#666;cursor:pointer;}
+  .radio-chip.active{background:var(--orange);border-color:var(--orange);color:#fff;}
+  .calc-result{background:#fff8f3;border-radius:10px;padding:10px 14px;margin-top:8px;font-size:12px;color:#a06030;line-height:1.6;}
+
+  /* ===== DATE PICKER PAGE (P02-A) ===== */
+  .picker-hero{background:linear-gradient(135deg,#fff8f0,#fff4ea);padding:28px 20px 20px;text-align:center;border-bottom:1px solid #f0ebe4;}
+  .picker-fruit{font-size:60px;margin-bottom:8px;line-height:1;}
+  .picker-week{font-size:32px;font-weight:800;color:#1a1a1a;margin-bottom:4px;}
+  .picker-fruit-text{font-size:13px;color:#aaa;}
+  .picker-hint{font-size:13px;color:#888;text-align:center;padding:12px 20px;border-bottom:1px solid #f0ebe4;}
+  .picker-wrap{position:relative;flex:1;overflow:hidden;}
+  .picker-columns{display:flex;height:220px;background:var(--white);}
+  .picker-col{flex:1;overflow:hidden;position:relative;display:flex;flex-direction:column;align-items:center;}
+  .picker-col-label{font-size:11px;color:#aaa;padding:8px 0 4px;text-align:center;background:var(--white);position:sticky;top:0;}
+  .picker-highlight{position:absolute;top:50%;left:0;right:0;height:40px;transform:translateY(-50%);background:rgba(255,140,66,.08);border-top:1.5px solid rgba(255,140,66,.3);border-bottom:1.5px solid rgba(255,140,66,.3);pointer-events:none;z-index:2;}
+  .picker-items{display:flex;flex-direction:column;align-items:center;padding:88px 0;}
+  .picker-item{height:40px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#ccc;width:100%;cursor:pointer;}
+  .picker-item.selected{color:#1a1a1a;font-weight:700;font-size:18px;}
+  .picker-item.near{color:#888;font-size:16px;}
+  .picker-fade-top{position:absolute;top:32px;left:0;right:0;height:100px;background:linear-gradient(to bottom,var(--white),transparent);pointer-events:none;z-index:3;}
+  .picker-fade-bottom{position:absolute;bottom:0;left:0;right:0;height:100px;background:linear-gradient(to top,var(--white),transparent);pointer-events:none;z-index:3;}
+  .picker-action{padding:16px 20px;background:var(--white);border-top:1px solid #f0ebe4;position:sticky;bottom:0;}
+  .picker-confirm{width:100%;height:50px;border-radius:14px;background:#1a1a1a;border:none;color:#fff;font-size:16px;font-weight:600;cursor:pointer;}
+
+  /* ===== SUCCESS MODAL ===== */
+  .success-overlay{position:absolute;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:200;}
+  .success-card{background:var(--white);border-radius:24px;padding:32px 24px;text-align:center;width:300px;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+  .success-emoji{font-size:52px;margin-bottom:12px;}
+  .success-title{font-size:22px;font-weight:800;color:#1a1a1a;margin-bottom:8px;}
+  .success-sub{font-size:14px;color:#888;line-height:1.6;margin-bottom:20px;}
+  .success-week{font-size:16px;font-weight:700;color:var(--orange);background:#fff8f3;border-radius:10px;padding:8px 16px;display:inline-block;margin-bottom:20px;}
+  .success-btn{width:100%;height:50px;border-radius:14px;background:linear-gradient(135deg,var(--orange),#FF6030);border:none;color:#fff;font-size:16px;font-weight:600;cursor:pointer;}
+
+  /* ===== BOTTOM BTN ===== */
+  .bottom-action{padding:16px 20px;background:var(--white);border-top:1px solid #f0ebe4;position:sticky;bottom:0;}
+  .next-btn{width:100%;height:50px;border-radius:14px;background:linear-gradient(135deg,var(--orange),#FF6030);border:none;color:#fff;font-size:16px;font-weight:600;cursor:pointer;}
+  .next-btn:disabled{background:#e0d8d0;color:#aaa;}
+</style>
+</head>
+<body>
+<div class="demo">
+
+  <!-- ============ P01: 引导页（首屏） ============ -->
+  <div>
+  <div class="phone">
+    <div class="phone-inner" style="display:block;position:relative;">
+      <div class="splash">
+        <div class="status-bar" style="width:100%;position:relative;">
+          <span class="status-time" style="color:#888;">9:41</span>
+          <div class="status-icons" style="color:#888;">📶 🔋</div>
+        </div>
+        <div class="splash-top">
+          <div class="splash-logo">🤱</div>
+          <div class="splash-brand">MOM孕期助手</div>
+          <div class="splash-slogan">为你的宝宝保驾护航</div>
+          <div class="splash-illus">🤰</div>
+        </div>
+        <div style="width:100%;">
+          <div class="splash-features">
+            <div class="feature-row">
+              <div class="feature-icon">📅</div>
+              <div class="feature-text">智能产检提醒，不漏一次检查</div>
+            </div>
+            <div class="feature-row">
+              <div class="feature-icon">🔬</div>
+              <div class="feature-text">AI解读检验报告，看懂每个数值</div>
+            </div>
+            <div class="feature-row">
+              <div class="feature-icon">👶</div>
+              <div class="feature-text">每周宝宝发育，陪伴整个孕程</div>
+            </div>
+            <div class="feature-row">
+              <div class="feature-icon">🤖</div>
+              <div class="feature-text">MOM智能助手，随时解答困惑</div>
+            </div>
+          </div>
+          <button class="splash-btn" onclick="location.href='home-tab.html'">微信一键登录</button>
+          <div class="splash-login">已有账号？<span>直接登录</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="label">P01 · 引导首屏</div>
+  </div>
+
+  <!-- ============ P01-B: 微信授权弹窗 ============ -->
+  <div>
+  <div class="phone">
+    <div class="phone-inner" style="display:block;position:relative;">
+      <!-- 背景（首屏模糊） -->
+      <div style="width:375px;height:812px;background:linear-gradient(160deg,#FFF3E8,#FFE8D0 40%,#F5EAF0);position:absolute;inset:0;filter:blur(2px);">
+        <div style="display:flex;flex-direction:column;align-items:center;padding-top:120px;gap:20px;opacity:.5;">
+          <div style="font-size:80px;">🤰</div>
+          <div style="font-size:28px;font-weight:800;color:#1a1a1a;">MOM孕期助手</div>
+        </div>
+      </div>
+      <!-- 遮罩 -->
+      <div style="position:absolute;inset:0;background:rgba(0,0,0,.3);"></div>
+      <!-- 授权弹窗 -->
+      <div class="wechat-modal" style="position:absolute;">
+        <div class="modal-handle"></div>
+        <div class="wechat-logo">💬</div>
+        <div class="wechat-title">使用微信登录</div>
+        <div class="wechat-sub">授权后使用你的微信头像和昵称<br>开启你的孕期健康管理之旅</div>
+        <button class="wechat-btn">
+          <span style="font-size:20px;">💬</span>
+          微信一键授权登录
+        </button>
+        <button class="wechat-skip">暂不授权，仅浏览</button>
+        <div class="privacy-text">
+          登录即代表你已阅读并同意<br>
+          <span class="privacy-link">《用户协议》</span> 和 <span class="privacy-link">《隐私政策》</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="label">P01-B · 微信授权弹窗</div>
+  </div>
+
+  <!-- ============ P02: 建档引导页 ============ -->
+  <div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="status-bar" style="background:linear-gradient(135deg,#fff8f0,#fff4ea);">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">📶 🔋</div>
+      </div>
+      <div class="onboard-hero">
+        <div class="onboard-step">
+          <div class="step-dot active"></div>
+          <div class="step-dot"></div>
+          <div class="step-dot"></div>
+        </div>
+        <div class="onboard-illus">📋</div>
+        <div class="onboard-title">建立你的孕期档案</div>
+        <div class="onboard-sub">录入基础信息后，我们将为你<br>提供个性化的孕期健康管理服务</div>
+      </div>
+
+      <!-- 基础信息 -->
+      <div class="form-section">
+        <div class="form-title">📝 基础孕期信息</div>
+
+        <div class="form-row">
+          <div class="form-label">末次月经日期（LMP）<span class="form-required">必填</span></div>
+          <input class="form-input filled" value="2025年11月25日" placeholder="请选择日期">
+          <div style="font-size:11px;color:#aaa;margin-top:4px;">系统将自动计算你的预产期和当前孕周</div>
+        </div>
+
+        <div class="calc-result">
+          📌 根据末次月经日期计算：<br>
+          · <strong>预产期：2026年9月1日</strong><br>
+          · 当前孕周：<strong>孕14周3天</strong>
+        </div>
+
+        <div class="form-row" style="margin-top:14px;">
+          <div class="form-label">预产期<span class="form-required">自动计算（可修改）</span></div>
+          <input class="form-input filled" value="2026年9月1日" placeholder="或直接输入预产期">
+        </div>
+      </div>
+
+      <!-- 体格信息 -->
+      <div class="form-section">
+        <div class="form-title">⚖️ 体格信息</div>
+        <div class="form-row">
+          <div class="form-label">孕前体重<span class="form-required">必填</span></div>
+          <div class="form-input-row">
+            <input class="form-input filled" value="55" style="flex:1;text-align:center;font-size:18px;font-weight:600;">
+            <div class="form-input-unit">kg</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">身高<span class="form-required">必填</span></div>
+          <div class="form-input-row">
+            <input class="form-input filled" value="165" style="flex:1;text-align:center;font-size:18px;font-weight:600;">
+            <div class="form-input-unit">cm</div>
+          </div>
+        </div>
+        <div class="calc-result">
+          📌 孕前BMI：<strong>20.2</strong>（正常）<br>
+          · 全孕期建议增重：<strong>11.5~16 kg</strong><br>
+          · 参考 WHO IOM 2009 标准
+        </div>
+      </div>
+
+      <!-- 孕产情况 -->
+      <div class="form-section">
+        <div class="form-title">🤱 孕产情况（选填）</div>
+        <div class="form-row">
+          <div class="form-label">初/经产妇</div>
+          <div class="radio-row">
+            <div class="radio-chip active">初产妇（第一胎）</div>
+            <div class="radio-chip">经产妇</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">是否双胎</div>
+          <div class="radio-row">
+            <div class="radio-chip active">单胎</div>
+            <div class="radio-chip">双胎/多胎</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">高危因素（可多选）</div>
+          <div class="radio-row">
+            <div class="radio-chip">妊高症史</div>
+            <div class="radio-chip active">妊娠糖尿病</div>
+            <div class="radio-chip">高龄（≥35岁）</div>
+            <div class="radio-chip">无</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">就诊医院</div>
+          <input class="form-input" placeholder="搜索医院（选填）">
+        </div>
+      </div>
+
+      <div class="bottom-action">
+        <button class="next-btn" onclick="location.href='home-tab.html'">完成建档，进入首页 →</button>
+      </div>
+    </div>
+  </div>
+  <div class="label">P02 · 建档引导页</div>
+  </div>
+
+  <!-- ============ P02-A: 录入预产期页（滚轮选择器） ============ -->
+  <div>
+  <div class="phone">
+    <div class="phone-inner" style="display:flex;flex-direction:column;">
+      <div class="status-bar" style="background:linear-gradient(135deg,#fff8f0,#fff4ea);">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">📶 🔋</div>
+      </div>
+      <div class="nav-bar">
+        <div class="nav-back">‹</div>
+        <div class="nav-title">录入预产期</div>
+        <div style="width:32px;"></div>
+      </div>
+
+      <!-- 动态孕周预览 -->
+      <div class="picker-hero">
+        <div class="picker-fruit">🥭</div>
+        <div class="picker-week">14周3天</div>
+        <div class="picker-fruit-text">此时胎儿宝宝大小像一颗——芒果</div>
+      </div>
+
+      <div class="picker-hint">录入预产期，可以获得更多个性化孕期健康建议</div>
+
+      <!-- 滚轮选择器 -->
+      <div style="background:var(--white);flex:1;position:relative;">
+        <!-- 列标题 -->
+        <div style="display:flex;border-bottom:1px solid #f0ebe4;">
+          <div style="flex:1;text-align:center;font-size:11px;color:#aaa;padding:8px 0;">年</div>
+          <div style="flex:1;text-align:center;font-size:11px;color:#aaa;padding:8px 0;">月</div>
+          <div style="flex:1;text-align:center;font-size:11px;color:#aaa;padding:8px 0;">日</div>
+        </div>
+
+        <!-- 选择区 -->
+        <div style="position:relative;overflow:hidden;height:220px;">
+          <!-- 高亮条 -->
+          <div style="position:absolute;top:50%;left:12px;right:12px;height:44px;transform:translateY(-50%);background:rgba(255,140,66,.07);border-top:1.5px solid rgba(255,140,66,.35);border-bottom:1.5px solid rgba(255,140,66,.35);border-radius:8px;pointer-events:none;z-index:2;"></div>
+          <!-- 上遮罩 -->
+          <div style="position:absolute;top:0;left:0;right:0;height:88px;background:linear-gradient(to bottom,rgba(255,255,255,1),rgba(255,255,255,0));z-index:3;pointer-events:none;"></div>
+          <!-- 下遮罩 -->
+          <div style="position:absolute;bottom:0;left:0;right:0;height:88px;background:linear-gradient(to top,rgba(255,255,255,1),rgba(255,255,255,0));z-index:3;pointer-events:none;"></div>
+
+          <!-- 年列 -->
+          <div style="position:absolute;left:0;width:33.33%;height:100%;display:flex;flex-direction:column;align-items:center;overflow:hidden;">
+            <div style="display:flex;flex-direction:column;align-items:center;transform:translateY(-4px);">
+              <div style="height:44px;display:flex;align-items:center;font-size:14px;color:#ccc;">2024</div>
+              <div style="height:44px;display:flex;align-items:center;font-size:15px;color:#aaa;">2025</div>
+              <div style="height:44px;display:flex;align-items:center;font-size:18px;font-weight:700;color:#1a1a1a;">2026</div>
+              <div style="height:44px;display:flex;align-items:center;font-size:15px;color:#aaa;">2027</div>
+              <div style="height:44px;display:flex;align-items:center;font-size:14px;color:#ccc;">2028</div>
+            </div>
+          </div>
+
+          <!-- 月列 -->
+          <div style="position:absolute;left:33.33%;width:33.33%;height:100%;display:flex;flex-direction:column;align-items:center;overflow:hidden;">
+            <div style="display:flex;flex-direction:column;align-items:center;transform:translateY(-4px);">
+              <div style="height:44px;display:flex;align-items:center;font-size:14px;color:#ccc;">6月</div>
+              <div style="height:44px;display:flex;align-items:center;font-size:15px;color:#aaa;">7月</div>
+              <div style="height:44px;display:flex;align-items:center;font-size:18px;font-weight:700;color:#1a1a1a;">8月</div>
+              <div style="height:44px;display:flex;align-items:center;font-size:15px;color:#aaa;">9月</div>
+              <div style="height:44px;display:flex;align-items:center;font-size:14px;color:#ccc;">10月</div>
+            </div>
+          </div>
+
+          <!-- 日列 -->
+          <div style="position:absolute;left:66.66%;width:33.33%;height:100%;display:flex;flex-direction:column;align-items:center;overflow:hidden;">
+            <div style="display:flex;flex-direction:column;align-items:center;transform:translateY(-4px);">
+              <div style="height:44px;display:flex;align-items:center;font-size:14px;color:#ccc;">13日</div>
+              <div style="height:44px;display:flex;align-items:center;font-size:15px;color:#aaa;">14日</div>
+              <div style="height:44px;display:flex;align-items:center;font-size:18px;font-weight:700;color:#1a1a1a;">15日</div>
+              <div style="height:44px;display:flex;align-items:center;font-size:15px;color:#aaa;">16日</div>
+              <div style="height:44px;display:flex;align-items:center;font-size:14px;color:#ccc;">17日</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding:8px 20px;background:#f9f5f0;border-top:1px solid #f0ebe4;text-align:center;">
+          <div style="font-size:13px;color:#a06030;font-weight:500;">已选预产期：<strong>2026年8月15日</strong></div>
+        </div>
+      </div>
+
+      <div class="picker-action">
+        <button class="picker-confirm">完 成</button>
+      </div>
+    </div>
+  </div>
+  <div class="label">P02-A · 录入预产期（滚轮选择器）</div>
+  </div>
+
+  <!-- ============ P02-A-SUCCESS: 录入成功弹窗 ============ -->
+  <div>
+  <div class="phone">
+    <div class="phone-inner" style="display:block;position:relative;">
+      <!-- 背景（选择器页面模糊） -->
+      <div style="width:375px;height:812px;background:var(--white);position:absolute;inset:0;">
+        <div style="background:linear-gradient(135deg,#fff8f0,#fff4ea);padding:28px 20px 20px;text-align:center;">
+          <div style="font-size:60px;margin-bottom:8px;">🥭</div>
+          <div style="font-size:32px;font-weight:800;color:#1a1a1a;margin-bottom:4px;">14周3天</div>
+          <div style="font-size:13px;color:#aaa;">此时胎儿宝宝大小像一颗——芒果</div>
+        </div>
+      </div>
+      <!-- 遮罩 -->
+      <div style="position:absolute;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);"></div>
+      <!-- 成功弹窗 -->
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border-radius:24px;padding:32px 24px;text-align:center;width:300px;box-shadow:0 20px 60px rgba(0,0,0,.25);">
+        <div style="font-size:52px;margin-bottom:12px;">🎉</div>
+        <div style="font-size:22px;font-weight:800;color:#1a1a1a;margin-bottom:8px;">太棒了！</div>
+        <div style="font-size:14px;color:#888;line-height:1.6;margin-bottom:14px;">你已经成功开启了孕期准备的第一步</div>
+        <div style="font-size:15px;font-weight:700;color:var(--orange);background:#fff8f3;border-radius:10px;padding:10px 16px;display:inline-block;margin-bottom:20px;">
+          预产期 2026年8月15日<br>
+          <span style="font-size:12px;color:#aaa;font-weight:400;">当前孕周 · 孕14周3天</span>
+        </div>
+        <button onclick="location.href='home-tab.html'" style="width:100%;height:50px;border-radius:14px;background:linear-gradient(135deg,var(--orange),#FF6030);border:none;color:#fff;font-size:16px;font-weight:600;cursor:pointer;">开始孕期旅程 →</button>
+      </div>
+    </div>
+  </div>
+  <div class="label">P02-A-S · 录入成功弹窗</div>
+  </div>
+
+</div>
+</body>
+</html>

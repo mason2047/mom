@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>健康记录 · MOM孕期助手</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue',sans-serif;background:#e8e0d8;color:#333;}
+  :root{--orange:#FF8C42;--green:#4CAF7D;--red:#E05252;--blue:#5B8BF5;--purple:#9B6FD4;--gray:#999;--bg:#f5f1ec;--white:#fff;--card-r:16px;}
+
+  .demo{display:flex;gap:28px;padding:40px;background:#e8e0d8;min-height:100vh;align-items:flex-start;flex-wrap:wrap;}
+  .phone{width:375px;min-height:812px;background:var(--bg);border-radius:44px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.22);position:relative;flex-shrink:0;}
+  .phone-inner{width:375px;height:812px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;}
+  .phone-inner::-webkit-scrollbar{display:none;}
+  .label{font-size:13px;color:#888;text-align:center;margin-top:12px;font-weight:500;}
+
+  .status-bar{height:44px;background:var(--white);display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:100;}
+  .status-time{font-size:15px;font-weight:600;}
+  .status-icons{display:flex;gap:6px;align-items:center;font-size:12px;}
+  .nav-bar{height:52px;background:var(--white);display:flex;align-items:center;padding:0 16px;border-bottom:1px solid #f0ebe4;gap:12px;position:sticky;top:44px;z-index:99;}
+  .nav-back{width:32px;height:32px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;}
+  .nav-title{flex:1;font-size:17px;font-weight:600;color:#1a1a1a;text-align:center;}
+  .nav-right{font-size:13px;color:var(--orange);font-weight:500;}
+
+  /* ===== DASHBOARD ===== */
+  .dash-hero{background:linear-gradient(135deg,#fff6f0,#fffaf5);padding:20px 20px 16px;border-bottom:1px solid #f0ebe4;}
+  .dash-greeting{font-size:13px;color:#aaa;margin-bottom:4px;}
+  .dash-subtitle{font-size:15px;font-weight:600;color:#333;margin-bottom:16px;}
+  .dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .dash-card{background:var(--white);border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.05);cursor:pointer;}
+  .dash-card-icon{font-size:22px;margin-bottom:6px;}
+  .dash-card-label{font-size:11px;color:#aaa;margin-bottom:2px;}
+  .dash-card-value{font-size:18px;font-weight:700;color:#1a1a1a;}
+  .dash-card-unit{font-size:11px;color:#aaa;margin-left:2px;}
+  .dash-card-trend{font-size:11px;margin-top:4px;}
+  .trend-up{color:var(--orange);}
+  .trend-ok{color:var(--green);}
+  .trend-warn{color:var(--red);}
+  .dash-card.abnormal{border:1.5px solid #ffe0e0;}
+
+  /* ===== CHART AREA ===== */
+  .chart-section{padding:16px;}
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .section-title{font-size:15px;font-weight:600;color:#1a1a1a;}
+  .section-link{font-size:12px;color:var(--orange);}
+  .chart-card{background:var(--white);border-radius:var(--card-r);padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+  .chart-tabs{display:flex;gap:6px;margin-bottom:14px;}
+  .chart-tab{padding:5px 12px;border-radius:16px;font-size:12px;color:#888;background:var(--bg);cursor:pointer;}
+  .chart-tab.active{background:var(--orange);color:var(--white);font-weight:500;}
+
+  /* SVG chart mock */
+  .chart-svg{width:100%;height:120px;}
+
+  .chart-legend{display:flex;gap:14px;margin-top:10px;}
+  .legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#888;}
+  .legend-dot{width:8px;height:8px;border-radius:50%;}
+
+  /* ===== RECORD LIST ===== */
+  .record-list{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+  .record-item{background:var(--white);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+  .record-date{font-size:11px;color:#aaa;width:52px;flex-shrink:0;text-align:center;}
+  .record-date-day{font-size:17px;font-weight:700;color:#333;display:block;}
+  .record-date-mon{font-size:10px;color:#aaa;}
+  .record-divider{width:1px;height:32px;background:#f0ebe4;}
+  .record-body{flex:1;}
+  .record-value{font-size:16px;font-weight:600;color:#1a1a1a;}
+  .record-meta{font-size:11px;color:#aaa;margin-top:2px;}
+  .record-badge{font-size:10px;padding:2px 8px;border-radius:8px;font-weight:500;flex-shrink:0;}
+  .badge-normal{background:#e8f5ee;color:var(--green);}
+  .badge-warn{background:#fff3eb;color:var(--orange);}
+  .badge-danger{background:#fef0f0;color:var(--red);}
+
+  /* ===== ADD BUTTON ===== */
+  .add-fab{position:sticky;bottom:72px;right:20px;float:right;width:52px;height:52px;border-radius:50%;background:var(--orange);box-shadow:0 4px 16px rgba(255,140,66,.4);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--white);cursor:pointer;margin-right:20px;}
+
+  /* ===== INPUT FORM (bottom sheet) ===== */
+  .input-sheet{background:var(--white);border-radius:20px 20px 0 0;padding:20px;margin-top:auto;}
+  .sheet-handle{width:36px;height:4px;background:#e0d8d0;border-radius:2px;margin:0 auto 16px;}
+  .sheet-title{font-size:16px;font-weight:600;color:#1a1a1a;margin-bottom:4px;}
+  .sheet-hint{font-size:12px;color:#aaa;margin-bottom:20px;}
+  .input-big{display:flex;align-items:baseline;justify-content:center;gap:8px;margin:16px 0;}
+  .input-number{font-size:48px;font-weight:700;color:var(--orange);background:none;border:none;outline:none;text-align:center;width:160px;}
+  .input-unit{font-size:18px;color:#aaa;font-weight:500;}
+  .input-sublabels{display:flex;gap:10px;justify-content:center;margin-bottom:16px;}
+  .input-sublabel{flex:1;text-align:center;font-size:12px;color:#aaa;}
+  .input-row{display:flex;gap:10px;margin-bottom:14px;}
+  .input-field{flex:1;text-align:center;height:50px;border-radius:12px;border:1.5px solid #e8e2da;font-size:22px;font-weight:700;color:#333;background:#fafaf8;outline:none;}
+  .input-field.focused{border-color:var(--orange);}
+  .input-sep{display:flex;align-items:center;font-size:18px;color:#aaa;padding:0 4px;}
+  .time-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+  .time-label{font-size:13px;color:#666;width:60px;}
+  .time-chips{display:flex;gap:6px;flex-wrap:wrap;}
+  .time-chip{padding:6px 12px;border-radius:16px;border:1.5px solid #e0d8d0;font-size:12px;color:#666;cursor:pointer;}
+  .time-chip.active{background:var(--blue);border-color:var(--blue);color:var(--white);}
+  .ref-box{background:#f5f1ec;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#888;line-height:1.6;}
+  .confirm-btn{width:100%;height:50px;border-radius:14px;background:var(--orange);border:none;color:var(--white);font-size:16px;font-weight:600;cursor:pointer;}
+
+  /* ===== TAB BAR ===== */
+  .tab-bar{height:56px;background:var(--white);display:flex;border-top:1px solid #f0ebe4;position:sticky;bottom:0;}
+  .tab-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;}
+  .tab-icon{font-size:22px;}
+  .tab-text{font-size:10px;color:#bbb;}
+
+  /* ===== FETAL WEIGHT ===== */
+  .formula-box{background:#f0f4ff;border-radius:10px;padding:10px 14px;font-size:11px;color:#666;line-height:1.6;margin-bottom:12px;}
+  .result-hero{text-align:center;padding:20px;}
+  .result-weight{font-size:44px;font-weight:800;color:var(--orange);}
+  .result-weight-unit{font-size:16px;color:#aaa;font-weight:400;}
+  .result-jin{font-size:14px;color:#888;margin-top:4px;}
+  .result-badge{display:inline-block;padding:4px 16px;border-radius:20px;background:#e8f5ee;color:var(--green);font-size:13px;font-weight:600;margin-top:8px;}
+  .range-bar-wrap{margin:16px 0;}
+  .range-bar{height:12px;border-radius:6px;background:linear-gradient(90deg,#fef0f0,#e8f5ee,#fef0f0);position:relative;margin-bottom:6px;}
+  .range-indicator{position:absolute;top:-3px;width:18px;height:18px;border-radius:50%;background:var(--orange);border:2px solid var(--white);box-shadow:0 2px 6px rgba(255,140,66,.5);transform:translateX(-50%);}
+  .range-labels{display:flex;justify-content:space-between;font-size:10px;color:#aaa;}
+  .data-table{width:100%;border-collapse:collapse;}
+  .data-table th{font-size:11px;color:#aaa;font-weight:500;padding:6px 8px;text-align:left;border-bottom:1px solid #f0ebe4;}
+  .data-table td{font-size:13px;color:#333;padding:10px 8px;border-bottom:1px solid #f9f5f0;}
+  .data-table tr:last-child td{border-bottom:none;}
+
+  /* ===== KICK COUNTER ===== */
+  .kick-hero{background:linear-gradient(135deg,#f0f8ff,#e8f4ff);padding:24px 20px;text-align:center;border-bottom:1px solid #e0ecff;}
+  .kick-time{font-size:13px;color:#5B8BF5;margin-bottom:8px;}
+  .kick-count{font-size:56px;font-weight:800;color:var(--blue);line-height:1;}
+  .kick-label{font-size:13px;color:#8aabf0;margin-top:4px;margin-bottom:16px;}
+  .kick-btn{width:100px;height:100px;border-radius:50%;background:var(--blue);border:none;color:var(--white);font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 6px 24px rgba(91,139,245,.4);margin:8px auto;display:block;transition:transform .1s;}
+  .kick-btn:active{transform:scale(.93);}
+  .kick-stats{display:flex;gap:10px;padding:12px 20px;background:var(--white);}
+  .kick-stat{flex:1;text-align:center;padding:12px;background:var(--bg);border-radius:12px;}
+  .kick-stat-val{font-size:20px;font-weight:700;color:#333;}
+  .kick-stat-label{font-size:11px;color:#aaa;margin-top:2px;}
+  .kick-history-item{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:var(--white);border-bottom:1px solid #f5f1ec;}
+  .kick-history-date{font-size:13px;color:#333;font-weight:500;}
+  .kick-history-count{font-size:13px;font-weight:600;color:var(--blue);}
+  .kick-history-badge{font-size:11px;padding:2px 8px;border-radius:8px;}
+</style>
+</head>
+<body>
+<div class="demo">
+
+  <!-- ============ P18: 健康综合看板 ============ -->
+  <div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">📶 🔋</div>
+      </div>
+      <div class="nav-bar">
+        <div class="nav-back" onclick="location.href='home-tab.html'" style="cursor:pointer;">‹</div>
+        <div class="nav-title">健康记录</div>
+        <div class="nav-right">历史</div>
+      </div>
+
+      <div class="dash-hero">
+        <div class="dash-greeting">孕14周3天 · 2026年3月15日</div>
+        <div class="dash-subtitle">最近健康数据一览</div>
+        <div class="dash-grid">
+          <div class="dash-card" onclick="">
+            <div class="dash-card-icon">⚖️</div>
+            <div class="dash-card-label">体重</div>
+            <div class="dash-card-value">58.4<span class="dash-card-unit">kg</span></div>
+            <div class="dash-card-trend trend-up">↑ 较上次 +0.6kg</div>
+          </div>
+          <div class="dash-card abnormal" onclick="">
+            <div class="dash-card-icon">💉</div>
+            <div class="dash-card-label">血压</div>
+            <div class="dash-card-value" style="font-size:15px;color:var(--orange);">128/82</div>
+            <div class="dash-card-trend trend-warn">⚠️ 偏高，请关注</div>
+          </div>
+          <div class="dash-card" onclick="">
+            <div class="dash-card-icon">🩸</div>
+            <div class="dash-card-label">血糖（空腹）</div>
+            <div class="dash-card-value">4.8<span class="dash-card-unit">mmol/L</span></div>
+            <div class="dash-card-trend trend-ok">✓ 正常范围</div>
+          </div>
+          <div class="dash-card" onclick="">
+            <div class="dash-card-icon">👶</div>
+            <div class="dash-card-label">胎儿估重</div>
+            <div class="dash-card-value">320<span class="dash-card-unit">g</span></div>
+            <div class="dash-card-trend trend-ok">✓ 发育正常</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weight Chart -->
+      <div class="chart-section">
+        <div class="section-header">
+          <div class="section-title">⚖️ 体重趋势</div>
+          <div class="section-link">全部记录 ›</div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-tabs">
+            <div class="chart-tab active">近2周</div>
+            <div class="chart-tab">近1月</div>
+            <div class="chart-tab">全孕期</div>
+          </div>
+          <!-- SVG 折线图 mock -->
+          <svg class="chart-svg" viewBox="0 0 343 120">
+            <!-- 参考区间 -->
+            <path d="M20,95 L323,40" stroke="#e8f5ee" stroke-width="12" fill="none" stroke-linecap="round"/>
+            <path d="M20,105 L323,55" stroke="#f0ebe4" stroke-width="8" fill="none" stroke-linecap="round"/>
+            <!-- 推荐区间标注 -->
+            <text x="260" y="38" font-size="9" fill="#4CAF7D">推荐上限</text>
+            <text x="260" y="58" font-size="9" fill="#aaa">推荐下限</text>
+            <!-- 用户数据折线 -->
+            <polyline points="20,100 67,97 114,95 161,92 208,89 255,86 302,83" stroke="#FF8C42" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- 数据点 -->
+            <circle cx="20" cy="100" r="4" fill="#FF8C42"/>
+            <circle cx="67" cy="97" r="4" fill="#FF8C42"/>
+            <circle cx="114" cy="95" r="4" fill="#FF8C42"/>
+            <circle cx="161" cy="92" r="4" fill="#FF8C42"/>
+            <circle cx="208" cy="89" r="4" fill="#FF8C42"/>
+            <circle cx="255" cy="86" r="4" fill="#FF8C42"/>
+            <circle cx="302" cy="83" r="5" fill="#FF8C42" stroke="#fff" stroke-width="2"/>
+            <!-- X轴日期 -->
+            <text x="14" y="115" font-size="9" fill="#aaa">3/1</text>
+            <text x="61" y="115" font-size="9" fill="#aaa">3/3</text>
+            <text x="108" y="115" font-size="9" fill="#aaa">3/5</text>
+            <text x="155" y="115" font-size="9" fill="#aaa">3/7</text>
+            <text x="202" y="115" font-size="9" fill="#aaa">3/9</text>
+            <text x="249" y="115" font-size="9" fill="#aaa">3/11</text>
+            <text x="293" y="115" font-size="9" fill="#aaa">3/15</text>
+            <!-- Y轴标注 -->
+            <text x="0" y="82" font-size="9" fill="#aaa">59</text>
+            <text x="0" y="102" font-size="9" fill="#aaa">57</text>
+          </svg>
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div>实际体重</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#c8e8d4"></div>推荐区间</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid #f5f1ec;">
+            <div style="text-align:center;"><div style="font-size:11px;color:#aaa;">孕前体重</div><div style="font-size:14px;font-weight:600;color:#333;">55.0 kg</div></div>
+            <div style="text-align:center;"><div style="font-size:11px;color:#aaa;">当前增重</div><div style="font-size:14px;font-weight:600;color:var(--orange);">+3.4 kg</div></div>
+            <div style="text-align:center;"><div style="font-size:11px;color:#aaa;">推荐增重范围</div><div style="font-size:14px;font-weight:600;color:var(--green);">+2~5 kg</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Entry -->
+      <div style="padding:0 16px 16px;">
+        <div class="section-header">
+          <div class="section-title">快速记录</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <div style="flex:1;background:var(--white);border-radius:12px;padding:12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.04);cursor:pointer;">
+            <div style="font-size:22px;margin-bottom:4px;">⚖️</div>
+            <div style="font-size:11px;color:#666;">记录体重</div>
+          </div>
+          <div style="flex:1;background:var(--white);border-radius:12px;padding:12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.04);cursor:pointer;">
+            <div style="font-size:22px;margin-bottom:4px;">💉</div>
+            <div style="font-size:11px;color:#666;">记录血压</div>
+          </div>
+          <div style="flex:1;background:var(--white);border-radius:12px;padding:12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.04);cursor:pointer;">
+            <div style="font-size:22px;margin-bottom:4px;">🩸</div>
+            <div style="font-size:11px;color:#666;">记录血糖</div>
+          </div>
+          <div style="flex:1;background:var(--white);border-radius:12px;padding:12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.04);cursor:pointer;">
+            <div style="font-size:22px;margin-bottom:4px;">🤰</div>
+            <div style="font-size:11px;color:#666;">胎动计数</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-bar">
+        <div class="tab-item"><div class="tab-icon">🏠</div><div class="tab-text">首页</div></div>
+        <div class="tab-item active"><div class="tab-icon">🤖</div><div class="tab-text" style="color:var(--orange)">MOM助手</div></div>
+        <div class="tab-item"><div class="tab-icon">👤</div><div class="tab-text">我的</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="label">P18 · 健康综合看板</div>
+  </div>
+
+  <!-- ============ P13: 体重记录页 ============ -->
+  <div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">📶 🔋</div>
+      </div>
+      <div class="nav-bar">
+        <div class="nav-back" onclick="location.href='home-tab.html'" style="cursor:pointer;">‹</div>
+        <div class="nav-title">体重管理</div>
+        <div class="nav-right"></div>
+      </div>
+
+      <!-- Stats Row -->
+      <div style="display:flex;gap:0;background:var(--white);padding:16px 20px;border-bottom:1px solid #f0ebe4;">
+        <div style="flex:1;text-align:center;border-right:1px solid #f0ebe4;">
+          <div style="font-size:11px;color:#aaa;margin-bottom:4px;">孕前体重</div>
+          <div style="font-size:18px;font-weight:700;color:#333;">55.0<span style="font-size:12px;color:#aaa;"> kg</span></div>
+        </div>
+        <div style="flex:1;text-align:center;border-right:1px solid #f0ebe4;">
+          <div style="font-size:11px;color:#aaa;margin-bottom:4px;">当前体重</div>
+          <div style="font-size:18px;font-weight:700;color:var(--orange);">58.4<span style="font-size:12px;color:#aaa;"> kg</span></div>
+        </div>
+        <div style="flex:1;text-align:center;">
+          <div style="font-size:11px;color:#aaa;margin-bottom:4px;">孕期增重</div>
+          <div style="font-size:18px;font-weight:700;color:var(--green);">+3.4<span style="font-size:12px;color:#aaa;"> kg</span></div>
+        </div>
+      </div>
+
+      <!-- BMI Info -->
+      <div style="background:#fff8f3;padding:10px 20px;border-bottom:1px solid #ffe8d0;display:flex;align-items:center;gap:8px;">
+        <div style="font-size:13px;color:#a06030;flex:1;">孕前BMI 20.2（正常）· 全孕期建议增重 <strong>11.5~16 kg</strong></div>
+        <div style="font-size:11px;color:var(--orange);white-space:nowrap;">目前✓正常</div>
+      </div>
+
+      <!-- Chart -->
+      <div class="chart-section">
+        <div class="chart-card">
+          <div class="chart-tabs">
+            <div class="chart-tab active">近1月</div>
+            <div class="chart-tab">孕早期</div>
+            <div class="chart-tab">孕中期</div>
+            <div class="chart-tab">全程</div>
+          </div>
+          <svg class="chart-svg" viewBox="0 0 343 110">
+            <path d="M10,90 L333,30" stroke="#e8f5ee" stroke-width="16" fill="none" opacity=".5"/>
+            <polyline points="10,90 50,87 90,85 130,82 170,80 210,77 250,74 290,72 323,70" stroke="#FF8C42" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="10" cy="90" r="3.5" fill="#FF8C42"/>
+            <circle cx="90" cy="85" r="3.5" fill="#FF8C42"/>
+            <circle cx="170" cy="80" r="3.5" fill="#FF8C42"/>
+            <circle cx="250" cy="74" r="3.5" fill="#FF8C42"/>
+            <circle cx="323" cy="70" r="4.5" fill="#FF8C42" stroke="#fff" stroke-width="2"/>
+            <text x="5" y="105" font-size="9" fill="#aaa">2/15</text>
+            <text x="165" y="105" font-size="9" fill="#aaa">3/1</text>
+            <text x="308" y="105" font-size="9" fill="#aaa">3/15</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Records -->
+      <div style="padding:0 16px 8px;">
+        <div class="section-header">
+          <div class="section-title">记录列表</div>
+          <div class="section-link">+ 新增</div>
+        </div>
+        <div class="record-list">
+          <div class="record-item">
+            <div class="record-date"><span class="record-date-day">15</span><div class="record-date-mon">3月</div></div>
+            <div class="record-divider"></div>
+            <div class="record-body">
+              <div class="record-value">58.4 kg</div>
+              <div class="record-meta">较上次 +0.6kg · 早晨空腹</div>
+            </div>
+            <div class="record-badge badge-normal">正常</div>
+          </div>
+          <div class="record-item">
+            <div class="record-date"><span class="record-date-day">12</span><div class="record-date-mon">3月</div></div>
+            <div class="record-divider"></div>
+            <div class="record-body">
+              <div class="record-value">57.8 kg</div>
+              <div class="record-meta">较上次 +0.4kg · 早晨空腹</div>
+            </div>
+            <div class="record-badge badge-normal">正常</div>
+          </div>
+          <div class="record-item">
+            <div class="record-date"><span class="record-date-day">10</span><div class="record-date-mon">3月</div></div>
+            <div class="record-divider"></div>
+            <div class="record-body">
+              <div class="record-value">57.4 kg</div>
+              <div class="record-meta">较上次 +0.3kg · 早晨空腹</div>
+            </div>
+            <div class="record-badge badge-normal">正常</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Sheet -->
+      <div class="input-sheet" style="margin:12px 16px;border-radius:var(--card-r);box-shadow:0 2px 8px rgba(0,0,0,.05);">
+        <div class="sheet-title">记录今日体重</div>
+        <div class="sheet-hint">孕14周3天 · 3月15日</div>
+        <div class="input-big">
+          <input class="input-number" value="58.4">
+          <span class="input-unit">kg</span>
+        </div>
+        <div class="ref-box">📌 孕14周推荐增重：2.0~4.0 kg · 当前 +3.4 kg ✓ 在正常范围内</div>
+        <button class="confirm-btn">保存记录</button>
+      </div>
+
+      <div class="tab-bar">
+        <div class="tab-item"><div class="tab-icon">🏠</div><div class="tab-text">首页</div></div>
+        <div class="tab-item active"><div class="tab-icon">🤖</div><div class="tab-text" style="color:var(--orange)">MOM助手</div></div>
+        <div class="tab-item"><div class="tab-icon">👤</div><div class="tab-text">我的</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="label">P13 · 体重管理页</div>
+  </div>
+
+  <!-- ============ P14: 血压记录页 ============ -->
+  <div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">📶 🔋</div>
+      </div>
+      <div class="nav-bar">
+        <div class="nav-back" onclick="location.href='home-tab.html'" style="cursor:pointer;">‹</div>
+        <div class="nav-title">血压记录</div>
+        <div class="nav-right"></div>
+      </div>
+
+      <!-- Warning Banner -->
+      <div style="background:#fff3eb;padding:10px 20px;border-bottom:1px solid #ffe8cc;display:flex;align-items:center;gap:8px;">
+        <div style="font-size:18px;">⚠️</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;color:#a06030;">最近一次血压偏高</div>
+          <div style="font-size:11px;color:#c08040;margin-top:2px;">收缩压128 mmHg，建议休息后复测，持续偏高请就医</div>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="chart-section">
+        <div class="chart-card">
+          <svg class="chart-svg" viewBox="0 0 343 120">
+            <!-- 警戒线 140 -->
+            <line x1="10" y1="22" x2="333" y2="22" stroke="#ffe0e0" stroke-width="1" stroke-dasharray="4,3"/>
+            <text x="280" y="19" font-size="9" fill="#e05252">警戒 140</text>
+            <!-- 注意线 120 -->
+            <line x1="10" y1="48" x2="333" y2="48" stroke="#ffe8cc" stroke-width="1" stroke-dasharray="4,3"/>
+            <text x="280" y="45" font-size="9" fill="#FF8C42">注意 120</text>
+            <!-- 收缩压折线 -->
+            <polyline points="30,60 90,55 150,52 210,58 270,56 323,50" stroke="#5B8BF5" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- 舒张压折线 -->
+            <polyline points="30,88 90,85 150,84 210,90 270,88 323,83" stroke="#9B6FD4" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- 最新点 -->
+            <circle cx="323" cy="50" r="5" fill="#5B8BF5" stroke="#fff" stroke-width="2"/>
+            <circle cx="323" cy="83" r="5" fill="#9B6FD4" stroke="#fff" stroke-width="2"/>
+            <!-- X轴 -->
+            <text x="24" y="112" font-size="9" fill="#aaa">3/8</text>
+            <text x="84" y="112" font-size="9" fill="#aaa">3/10</text>
+            <text x="144" y="112" font-size="9" fill="#aaa">3/12</text>
+            <text x="204" y="112" font-size="9" fill="#aaa">3/13</text>
+            <text x="264" y="112" font-size="9" fill="#aaa">3/14</text>
+            <text x="314" y="112" font-size="9" fill="#aaa">3/15</text>
+          </svg>
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>收缩压</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>舒张压</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Records -->
+      <div style="padding:0 16px 8px;">
+        <div class="section-header">
+          <div class="section-title">血压记录</div>
+          <div class="section-link">+ 新增</div>
+        </div>
+        <div class="record-list">
+          <div class="record-item" style="border:1.5px solid #fff3eb;">
+            <div class="record-date"><span class="record-date-day">15</span><div class="record-date-mon">3月</div></div>
+            <div class="record-divider"></div>
+            <div class="record-body">
+              <div class="record-value" style="color:var(--orange);">128 / 82 <span style="font-size:11px;color:#aaa;">mmHg</span></div>
+              <div class="record-meta">上午 10:30 · 坐姿休息后测量</div>
+            </div>
+            <div class="record-badge badge-warn">偏高</div>
+          </div>
+          <div class="record-item">
+            <div class="record-date"><span class="record-date-day">14</span><div class="record-date-mon">3月</div></div>
+            <div class="record-divider"></div>
+            <div class="record-body">
+              <div class="record-value">118 / 76 <span style="font-size:11px;color:#aaa;">mmHg</span></div>
+              <div class="record-meta">下午 3:00</div>
+            </div>
+            <div class="record-badge badge-normal">正常</div>
+          </div>
+          <div class="record-item">
+            <div class="record-date"><span class="record-date-day">12</span><div class="record-date-mon">3月</div></div>
+            <div class="record-divider"></div>
+            <div class="record-body">
+              <div class="record-value">115 / 74 <span style="font-size:11px;color:#aaa;">mmHg</span></div>
+              <div class="record-meta">早晨空腹</div>
+            </div>
+            <div class="record-badge badge-normal">正常</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Sheet -->
+      <div class="input-sheet" style="margin:12px 16px;border-radius:var(--card-r);box-shadow:0 2px 8px rgba(0,0,0,.05);">
+        <div class="sheet-title">记录血压</div>
+        <div class="input-row">
+          <input class="input-field focused" value="128">
+          <div class="input-sep">/</div>
+          <input class="input-field" value="82">
+          <div style="display:flex;align-items:center;padding-left:8px;font-size:13px;color:#aaa;">mmHg</div>
+        </div>
+        <div class="input-sublabels">
+          <div class="input-sublabel">收缩压（高压）</div>
+          <div class="input-sublabel"></div>
+          <div class="input-sublabel">舒张压（低压）</div>
+          <div class="input-sublabel"></div>
+        </div>
+        <div class="ref-box">📌 孕期正常血压：&lt;120/80 mmHg<br>注意区间：120-139/80-89 · 警戒：≥140/90</div>
+        <button class="confirm-btn">保存记录</button>
+      </div>
+
+      <div class="tab-bar">
+        <div class="tab-item"><div class="tab-icon">🏠</div><div class="tab-text">首页</div></div>
+        <div class="tab-item active"><div class="tab-icon">🤖</div><div class="tab-text" style="color:var(--orange)">MOM助手</div></div>
+        <div class="tab-item"><div class="tab-icon">👤</div><div class="tab-text">我的</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="label">P14 · 血压记录页</div>
+  </div>
+
+  <!-- ============ P15: 血糖记录页 ============ -->
+  <div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">📶 🔋</div>
+      </div>
+      <div class="nav-bar">
+        <div class="nav-back" onclick="location.href='home-tab.html'" style="cursor:pointer;">‹</div>
+        <div class="nav-title">血糖记录</div>
+        <div class="nav-right"></div>
+      </div>
+
+      <!-- Type Tabs -->
+      <div style="display:flex;background:var(--white);padding:10px 16px;gap:6px;border-bottom:1px solid #f0ebe4;">
+        <div class="chart-tab active" style="flex:1;text-align:center;">空腹</div>
+        <div class="chart-tab" style="flex:1;text-align:center;">餐后1h</div>
+        <div class="chart-tab" style="flex:1;text-align:center;">餐后2h</div>
+      </div>
+
+      <!-- Standard Info -->
+      <div style="background:#f0f9ff;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-size:12px;color:#4a8aad;">孕期空腹血糖标准：&lt; 5.1 mmol/L</div>
+        <div style="font-size:11px;color:#7ab0d0;">来自ADA指南</div>
+      </div>
+
+      <!-- Chart -->
+      <div class="chart-section" style="padding-top:12px;">
+        <div class="chart-card">
+          <svg class="chart-svg" viewBox="0 0 343 120">
+            <!-- 标准线 5.1 -->
+            <line x1="10" y1="35" x2="333" y2="35" stroke="#ffe0e0" stroke-width="1.5" stroke-dasharray="5,3"/>
+            <text x="270" y="32" font-size="9" fill="#E05252">上限 5.1</text>
+            <!-- 折线 -->
+            <polyline points="30,65 90,60 150,62 210,58 270,55 323,55" stroke="#5B8BF5" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="30" cy="65" r="4" fill="#5B8BF5"/>
+            <circle cx="90" cy="60" r="4" fill="#5B8BF5"/>
+            <circle cx="150" cy="62" r="4" fill="#5B8BF5"/>
+            <circle cx="210" cy="58" r="4" fill="#5B8BF5"/>
+            <circle cx="270" cy="55" r="4" fill="#5B8BF5"/>
+            <circle cx="323" cy="55" r="5" fill="#5B8BF5" stroke="#fff" stroke-width="2"/>
+            <!-- 数值标注 -->
+            <text x="18" y="58" font-size="9" fill="#5B8BF5">4.9</text>
+            <text x="78" y="53" font-size="9" fill="#5B8BF5">5.0</text>
+            <text x="138" y="55" font-size="9" fill="#5B8BF5">4.9</text>
+            <text x="198" y="51" font-size="9" fill="#5B8BF5">5.0</text>
+            <text x="258" y="48" font-size="9" fill="#5B8BF5">5.0</text>
+            <text x="311" y="48" font-size="9" fill="#5B8BF5">4.8</text>
+            <!-- X轴 -->
+            <text x="24" y="112" font-size="9" fill="#aaa">3/10</text>
+            <text x="84" y="112" font-size="9" fill="#aaa">3/11</text>
+            <text x="144" y="112" font-size="9" fill="#aaa">3/12</text>
+            <text x="204" y="112" font-size="9" fill="#aaa">3/13</text>
+            <text x="264" y="112" font-size="9" fill="#aaa">3/14</text>
+            <text x="314" y="112" font-size="9" fill="#aaa">3/15</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Records -->
+      <div style="padding:0 16px 8px;">
+        <div class="section-header">
+          <div class="section-title">空腹血糖记录</div>
+          <div class="section-link">+ 新增</div>
+        </div>
+        <div class="record-list">
+          <div class="record-item">
+            <div class="record-date"><span class="record-date-day">15</span><div class="record-date-mon">3月</div></div>
+            <div class="record-divider"></div>
+            <div class="record-body">
+              <div class="record-value">4.8 <span style="font-size:11px;color:#aaa;">mmol/L</span></div>
+              <div class="record-meta">空腹 · 07:30</div>
+            </div>
+            <div class="record-badge badge-normal">正常</div>
+          </div>
+          <div class="record-item">
+            <div class="record-date"><span class="record-date-day">14</span><div class="record-date-mon">3月</div></div>
+            <div class="record-divider"></div>
+            <div class="record-body">
+              <div class="record-value">5.0 <span style="font-size:11px;color:#aaa;">mmol/L</span></div>
+              <div class="record-meta">空腹 · 07:20</div>
+            </div>
+            <div class="record-badge badge-normal">正常</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Sheet -->
+      <div class="input-sheet" style="margin:8px 16px;border-radius:var(--card-r);box-shadow:0 2px 8px rgba(0,0,0,.05);">
+        <div class="sheet-title">记录血糖值</div>
+        <div class="time-row">
+          <div class="time-label">测量时机</div>
+          <div class="time-chips">
+            <div class="time-chip active">空腹</div>
+            <div class="time-chip">餐后1h</div>
+            <div class="time-chip">餐后2h</div>
+          </div>
+        </div>
+        <div class="input-big">
+          <input class="input-number" value="4.8" style="width:120px;">
+          <span class="input-unit">mmol/L</span>
+        </div>
+        <div class="ref-box">孕期血糖标准：空腹 &lt;5.1 ｜ 餐后1h &lt;10.0 ｜ 餐后2h &lt;8.5</div>
+        <button class="confirm-btn">保存记录</button>
+      </div>
+
+      <div class="tab-bar">
+        <div class="tab-item"><div class="tab-icon">🏠</div><div class="tab-text">首页</div></div>
+        <div class="tab-item active"><div class="tab-icon">🤖</div><div class="tab-text" style="color:var(--orange)">MOM助手</div></div>
+        <div class="tab-item"><div class="tab-icon">👤</div><div class="tab-text">我的</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="label">P15 · 血糖记录页</div>
+  </div>
+
+  <!-- ============ P16: 胎动计数页 ============ -->
+  <div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">📶 🔋</div>
+      </div>
+      <div class="nav-bar">
+        <div class="nav-back" onclick="location.href='home-tab.html'" style="cursor:pointer;">‹</div>
+        <div class="nav-title">胎动计数</div>
+        <div class="nav-right">历史</div>
+      </div>
+
+      <div class="kick-hero">
+        <div class="kick-time">今日 · 10:00~11:00 · 计时中 42:18</div>
+        <div class="kick-count">7</div>
+        <div class="kick-label">本小时胎动次数</div>
+        <button class="kick-btn">👶<br>记录胎动</button>
+        <div style="font-size:12px;color:#8aabf0;margin-top:8px;">每感受到一次胎动，点击上方按钮</div>
+      </div>
+
+      <div class="kick-stats">
+        <div class="kick-stat">
+          <div class="kick-stat-val" style="color:var(--blue);">7</div>
+          <div class="kick-stat-label">本次已记录</div>
+        </div>
+        <div class="kick-stat">
+          <div class="kick-stat-val">≥3~5</div>
+          <div class="kick-stat-label">1小时正常参考</div>
+        </div>
+        <div class="kick-stat">
+          <div class="kick-stat-val" style="color:var(--green);">✓ 正常</div>
+          <div class="kick-stat-label">当前评估</div>
+        </div>
+      </div>
+
+      <!-- 提示卡 -->
+      <div style="margin:12px 16px;background:#fff8f3;border-radius:12px;padding:12px 14px;border-left:3px solid var(--orange);">
+        <div style="font-size:13px;color:#a06030;line-height:1.6;">
+          🌸 <strong>胎动计数小贴士</strong><br>
+          · 建议每天固定1~3次，每次1小时<br>
+          · 饭后1小时胎儿最活跃，适合计数<br>
+          · <strong>1小时&lt;3次</strong>或连续<strong>2小时&lt;10次</strong>，请立即就医
+        </div>
+      </div>
+
+      <!-- 历史记录 -->
+      <div style="padding:0 16px 8px;">
+        <div class="section-header" style="margin-bottom:6px;">
+          <div class="section-title">近期胎动记录</div>
+        </div>
+      </div>
+      <div class="kick-history-item">
+        <div><div class="kick-history-date">3月14日 · 20:00~21:00</div><div style="font-size:11px;color:#aaa;margin-top:2px;">孕14周2天</div></div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="kick-history-count">12次</div>
+          <div class="kick-history-badge badge-normal">正常</div>
+        </div>
+      </div>
+      <div class="kick-history-item">
+        <div><div class="kick-history-date">3月13日 · 20:30~21:30</div><div style="font-size:11px;color:#aaa;margin-top:2px;">孕14周1天</div></div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="kick-history-count">8次</div>
+          <div class="kick-history-badge badge-normal">正常</div>
+        </div>
+      </div>
+      <div class="kick-history-item">
+        <div><div class="kick-history-date">3月12日 · 19:00~20:00</div><div style="font-size:11px;color:#aaa;margin-top:2px;">孕14周0天</div></div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="kick-history-count">5次</div>
+          <div class="kick-history-badge badge-normal">正常</div>
+        </div>
+      </div>
+
+      <div style="padding:16px;">
+        <button style="width:100%;height:46px;border-radius:12px;background:#fff3eb;border:none;color:var(--orange);font-size:14px;font-weight:600;cursor:pointer;">结束本次计数</button>
+      </div>
+
+      <div class="tab-bar">
+        <div class="tab-item"><div class="tab-icon">🏠</div><div class="tab-text">首页</div></div>
+        <div class="tab-item active"><div class="tab-icon">🤖</div><div class="tab-text" style="color:var(--orange)">MOM助手</div></div>
+        <div class="tab-item"><div class="tab-icon">👤</div><div class="tab-text">我的</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="label">P16 · 胎动计数页</div>
+  </div>
+
+  <!-- ============ P17: 胎儿估重页 ============ -->
+  <div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">📶 🔋</div>
+      </div>
+      <div class="nav-bar">
+        <div class="nav-back" onclick="location.href='home-tab.html'" style="cursor:pointer;">‹</div>
+        <div class="nav-title">胎儿估重</div>
+        <div class="nav-right">录入</div>
+      </div>
+
+      <!-- Result Hero -->
+      <div style="background:linear-gradient(135deg,#f0f4ff,#f8f0ff);padding:20px;text-align:center;border-bottom:1px solid #e8e0f0;">
+        <div style="font-size:12px;color:#9B6FD4;margin-bottom:6px;">孕14周 · 3月13日 B超数据</div>
+        <div class="result-weight">320<span class="result-weight-unit"> g</span></div>
+        <div class="result-jin" style="color:#9B6FD4;">约 0斤 6两</div>
+        <div class="result-badge">✓ 发育正常（P35~P65）</div>
+        <div style="font-size:11px;color:#aaa;margin-top:8px;">同孕周参考范围：P10 ≈ 240g · P90 ≈ 430g</div>
+      </div>
+
+      <!-- Range Bar -->
+      <div style="padding:16px 20px;background:var(--white);border-bottom:1px solid #f0ebe4;">
+        <div style="font-size:12px;color:#666;margin-bottom:10px;font-weight:500;">当前体重在同孕周中的位置</div>
+        <div class="range-bar">
+          <div class="range-indicator" style="left:42%;"></div>
+        </div>
+        <div class="range-labels">
+          <span>偏小 (&lt;P10)<br>240g</span>
+          <span style="text-align:center;">P50<br>325g</span>
+          <span style="text-align:right;">偏大 (&gt;P90)<br>430g</span>
+        </div>
+      </div>
+
+      <!-- Growth Chart -->
+      <div class="chart-section">
+        <div class="section-header">
+          <div class="section-title">胎儿生长曲线</div>
+          <div style="font-size:11px;color:#aaa;">参考WHO/中国标准</div>
+        </div>
+        <div class="chart-card">
+          <svg width="100%" height="130" viewBox="0 0 343 130">
+            <!-- P10带 -->
+            <path d="M20,120 C60,115 100,108 140,98 C180,88 220,72 260,55 C280,47 300,38 323,28" stroke="#e8e0f5" stroke-width="12" fill="none" opacity=".5"/>
+            <!-- P90带 -->
+            <path d="M20,108 C60,100 100,90 140,78 C180,64 220,48 260,32 C280,24 300,16 323,10" stroke="#e8e0f5" stroke-width="8" fill="none" opacity=".4"/>
+            <!-- P50中线 -->
+            <path d="M20,114 C60,107 100,99 140,88 C180,76 220,60 260,43 C280,36 300,27 323,19" stroke="#c8b8e8" stroke-width="1.5" stroke-dasharray="4,3" fill="none"/>
+            <!-- 用户数据 -->
+            <circle cx="68" cy="118" r="5" fill="#9B6FD4" stroke="#fff" stroke-width="2"/>
+            <circle cx="136" cy="112" r="5" fill="#9B6FD4" stroke="#fff" stroke-width="2"/>
+            <circle cx="204" cy="100" r="5" fill="#9B6FD4" stroke="#fff" stroke-width="2"/>
+            <circle cx="272" cy="83" r="6" fill="#9B6FD4" stroke="#fff" stroke-width="2"/>
+            <polyline points="68,118 136,112 204,100 272,83" stroke="#9B6FD4" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <!-- 标注 -->
+            <text x="263" y="78" font-size="9" fill="#9B6FD4">320g</text>
+            <!-- X轴 -->
+            <text x="55" y="128" font-size="9" fill="#aaa">8周</text>
+            <text x="123" y="128" font-size="9" fill="#aaa">11周</text>
+            <text x="191" y="128" font-size="9" fill="#aaa">13周</text>
+            <text x="259" y="128" font-size="9" fill="#aaa">14周</text>
+            <text x="298" y="128" font-size="9" fill="#aaa">→42周</text>
+          </svg>
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#9B6FD4"></div>宝宝体重</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#c8b8e8"></div>P50标准</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#e0d0f8"></div>P10~P90范围</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Input Form -->
+      <div style="margin:0 16px 16px;background:var(--white);border-radius:var(--card-r);padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);">
+        <div style="font-size:14px;font-weight:600;color:#333;margin-bottom:4px;">录入B超数据（Hadlock公式）</div>
+        <div style="font-size:11px;color:#aaa;margin-bottom:14px;">数据来源：B超报告，可AI自动提取</div>
+        <div class="formula-box">log₁₀(EFW) = 1.3596 + 0.0064×HC + 0.0424×AC + 0.174×FL + 0.00061×BPD×AC - 0.00386×AC×FL</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <div style="font-size:12px;color:#666;margin-bottom:4px;">双顶径 BPD (mm) *</div>
+            <input type="text" value="28.4" style="width:100%;height:40px;border-radius:8px;border:1.5px solid var(--orange);padding:0 10px;font-size:15px;font-weight:600;text-align:center;outline:none;">
+          </div>
+          <div>
+            <div style="font-size:12px;color:#666;margin-bottom:4px;">头围 HC (mm)</div>
+            <input type="text" value="102.6" style="width:100%;height:40px;border-radius:8px;border:1.5px solid #e0d8d0;padding:0 10px;font-size:15px;font-weight:600;text-align:center;outline:none;">
+          </div>
+          <div>
+            <div style="font-size:12px;color:#666;margin-bottom:4px;">腹围 AC (mm) *</div>
+            <input type="text" value="90.2" style="width:100%;height:40px;border-radius:8px;border:1.5px solid #e0d8d0;padding:0 10px;font-size:15px;font-weight:600;text-align:center;outline:none;">
+          </div>
+          <div>
+            <div style="font-size:12px;color:#666;margin-bottom:4px;">股骨长 FL (mm) *</div>
+            <input type="text" value="17.8" style="width:100%;height:40px;border-radius:8px;border:1.5px solid #e0d8d0;padding:0 10px;font-size:15px;font-weight:600;text-align:center;outline:none;">
+          </div>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;">
+          <button style="flex:1;height:42px;border-radius:10px;background:#f0f4ff;border:none;color:var(--blue);font-size:13px;font-weight:500;cursor:pointer;">📷 AI识别B超报告</button>
+          <button style="flex:1;height:42px;border-radius:10px;background:var(--orange);border:none;color:var(--white);font-size:13px;font-weight:600;cursor:pointer;">计算估重</button>
+        </div>
+        <div style="font-size:10px;color:#bbb;margin-top:8px;text-align:center;">⚠ 胎儿估重仅供参考，误差±15%，以产科医生超声评估为准</div>
+      </div>
+
+      <div class="tab-bar">
+        <div class="tab-item"><div class="tab-icon">🏠</div><div class="tab-text">首页</div></div>
+        <div class="tab-item active"><div class="tab-icon">🤖</div><div class="tab-text" style="color:var(--orange)">MOM助手</div></div>
+        <div class="tab-item"><div class="tab-icon">👤</div><div class="tab-text">我的</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="label">P17 · 胎儿估重页</div>
+  </div>
+
+</div>
+</body>
+</html>

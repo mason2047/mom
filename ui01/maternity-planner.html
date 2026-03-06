@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>月子规划 Agent · MOM孕期助手</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue',sans-serif;background:#e8e0d8;color:#333;}
+  :root{--orange:#FF8C42;--green:#4CAF7D;--red:#E05252;--blue:#5B8BF5;--gold:#E8A020;--rose:#E8607A;--bg:#f5f1ec;--white:#fff;--card-r:16px;}
+
+  .demo{display:flex;gap:28px;padding:40px;background:#e8e0d8;min-height:100vh;align-items:flex-start;flex-wrap:wrap;}
+  .phone{width:375px;min-height:812px;background:var(--bg);border-radius:44px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.22);position:relative;flex-shrink:0;}
+  .phone-inner{width:375px;height:812px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;}
+  .phone-inner::-webkit-scrollbar{display:none;}
+  .label{font-size:13px;color:#888;text-align:center;margin-top:12px;font-weight:500;}
+
+  .status-bar{height:44px;background:var(--white);display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:100;}
+  .status-time{font-size:15px;font-weight:600;}
+  .status-icons{font-size:12px;}
+  .nav-bar{height:52px;background:var(--white);display:flex;align-items:center;padding:0 16px;border-bottom:1px solid #f0ebe4;gap:12px;position:sticky;top:44px;z-index:99;}
+  .nav-back{width:32px;height:32px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;}
+  .nav-title{flex:1;font-size:17px;font-weight:600;color:#1a1a1a;text-align:center;}
+  .nav-right{font-size:13px;color:var(--rose);font-weight:500;}
+
+  /* ===== LIST PAGE HERO ===== */
+  .list-hero{background:linear-gradient(135deg,#fff0f4,#fff8f0);padding:16px 20px;border-bottom:1px solid #f0ebe4;}
+  .ai-banner{background:linear-gradient(135deg,var(--rose),#c04060);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+  .ai-banner-icon{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+  .ai-banner-text{flex:1;color:var(--white);}
+  .ai-banner-title{font-size:14px;font-weight:600;margin-bottom:2px;}
+  .ai-banner-sub{font-size:11px;opacity:.9;}
+  .ai-banner-btn{background:rgba(255,255,255,.25);border:none;color:var(--white);padding:5px 12px;border-radius:14px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;}
+
+  /* ===== TAB SWITCH ===== */
+  .tab-switch{display:flex;padding:10px 16px;gap:8px;background:var(--white);border-bottom:1px solid #f0ebe4;}
+  .tab-sw-btn{flex:1;height:36px;border-radius:18px;border:1.5px solid #e0d8d0;background:var(--white);font-size:13px;color:#666;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;}
+  .tab-sw-btn.active{background:var(--rose);border-color:var(--rose);color:var(--white);}
+
+  /* ===== FILTER BAR ===== */
+  .filter-bar{display:flex;gap:6px;padding:10px 16px;overflow-x:auto;scrollbar-width:none;background:var(--white);}
+  .filter-bar::-webkit-scrollbar{display:none;}
+  .filter-chip{padding:5px 12px;border-radius:16px;border:1.5px solid #e0d8d0;font-size:12px;color:#666;white-space:nowrap;cursor:pointer;display:flex;align-items:center;gap:3px;flex-shrink:0;}
+  .filter-chip.active{background:var(--rose);border-color:var(--rose);color:var(--white);}
+
+  /* ===== SERVICE CARD ===== */
+  .service-list{padding:12px 16px;display:flex;flex-direction:column;gap:12px;}
+  .service-card{background:var(--white);border-radius:var(--card-r);overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06);cursor:pointer;}
+  .service-img{width:100%;height:130px;background:linear-gradient(135deg,#fff0f4,#ffe0ea);display:flex;align-items:center;justify-content:center;font-size:50px;position:relative;}
+  .service-badge{position:absolute;top:8px;left:8px;display:flex;gap:5px;}
+  .badge-cert{background:rgba(232,96,122,.9);color:#fff;font-size:10px;padding:2px 7px;border-radius:8px;font-weight:600;}
+  .badge-rec{background:rgba(232,160,32,.9);color:#fff;font-size:10px;padding:2px 7px;border-radius:8px;font-weight:600;}
+  .service-body{padding:12px 14px;}
+  .service-name{font-size:16px;font-weight:700;color:#1a1a1a;margin-bottom:5px;}
+  .service-meta{display:flex;align-items:center;gap:10px;font-size:12px;color:#888;margin-bottom:8px;}
+  .service-rating{display:flex;align-items:center;gap:3px;color:var(--gold);}
+  .service-price{font-size:15px;font-weight:700;color:var(--rose);}
+  .service-price-unit{font-size:11px;color:#aaa;font-weight:400;}
+  .service-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;}
+  .service-tag{font-size:10px;background:#fff0f4;color:var(--rose);padding:2px 8px;border-radius:6px;}
+  .service-actions{display:flex;gap:8px;}
+  .service-btn{flex:1;height:36px;border-radius:8px;border:none;font-size:13px;font-weight:500;cursor:pointer;}
+  .service-btn-outline{background:var(--bg);color:#555;}
+  .service-btn-primary{background:var(--rose);color:var(--white);}
+
+  /* ===== DETAIL PAGE ===== */
+  .detail-swiper{width:100%;height:200px;background:linear-gradient(135deg,#fff0f4,#ffe0ea);display:flex;align-items:center;justify-content:center;font-size:70px;position:relative;}
+  .swiper-dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:5px;}
+  .swiper-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5);}
+  .swiper-dot.active{background:var(--white);width:16px;border-radius:3px;}
+  .detail-info{padding:16px 20px;background:var(--white);border-bottom:1px solid #f0ebe4;}
+  .detail-badges{display:flex;gap:6px;margin-bottom:8px;}
+  .detail-name{font-size:20px;font-weight:700;color:#1a1a1a;margin-bottom:4px;}
+  .detail-addr{font-size:13px;color:#888;display:flex;align-items:center;gap:4px;margin-bottom:4px;}
+  .detail-stats{display:flex;gap:12px;font-size:12px;color:#888;margin-top:6px;}
+  .detail-stat{display:flex;align-items:center;gap:3px;}
+  .detail-section{background:var(--white);margin:10px 16px;border-radius:var(--card-r);padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+  .detail-section-title{font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:10px;display:flex;align-items:center;gap:5px;}
+  .package-item{border:1.5px solid #f0ebe4;border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer;}
+  .package-item.selected{border-color:var(--rose);background:#fff8fa;}
+  .package-name{font-size:14px;font-weight:600;color:#333;margin-bottom:4px;}
+  .package-price{font-size:18px;font-weight:700;color:var(--rose);}
+  .package-desc{font-size:12px;color:#888;margin-top:4px;}
+  .feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .feature-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#555;}
+  .feature-check{color:var(--green);font-size:13px;}
+  .review-item{padding:12px 0;border-bottom:1px solid #f5f1ec;}
+  .review-item:last-child{border-bottom:none;}
+  .review-header{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+  .review-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#ffb8c8,#ff8090);display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;font-weight:600;}
+  .review-name{font-size:13px;font-weight:500;color:#333;}
+  .review-week{font-size:11px;color:#aaa;}
+  .review-stars{color:var(--gold);font-size:12px;}
+  .review-text{font-size:12px;color:#666;line-height:1.6;}
+  .bottom-bar{display:flex;gap:10px;padding:12px 16px;background:var(--white);border-top:1px solid #f0ebe4;position:sticky;bottom:0;}
+  .bottom-btn{flex:1;height:48px;border-radius:12px;border:none;font-size:15px;font-weight:600;cursor:pointer;}
+  .bottom-btn-chat{background:#fff0f4;color:var(--rose);border:1.5px solid var(--rose);}
+  .bottom-btn-book{background:linear-gradient(135deg,var(--rose),#c04060);color:var(--white);}
+
+  /* ===== NANNY CARD ===== */
+  .nanny-card{background:var(--white);border-radius:var(--card-r);padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.06);margin-bottom:10px;cursor:pointer;}
+  .nanny-top{display:flex;gap:12px;margin-bottom:10px;}
+  .nanny-avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#ffb8c8,#ff8090);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;}
+  .nanny-info{flex:1;}
+  .nanny-name{font-size:16px;font-weight:700;color:#1a1a1a;margin-bottom:2px;}
+  .nanny-meta{font-size:12px;color:#888;margin-bottom:6px;}
+  .nanny-tags{display:flex;gap:5px;flex-wrap:wrap;}
+  .nanny-tag{font-size:10px;background:#fff0f4;color:var(--rose);padding:2px 7px;border-radius:6px;}
+  .nanny-certs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+  .cert-badge{font-size:10px;background:#f0f9f5;color:var(--green);padding:3px 8px;border-radius:6px;font-weight:500;}
+  .schedule-row{display:flex;gap:4px;margin-bottom:10px;}
+  .schedule-day{flex:1;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;}
+  .day-free{background:#e8f5ee;color:var(--green);}
+  .day-busy{background:#f0ebe4;color:#aaa;}
+  .nanny-price{font-size:16px;font-weight:700;color:var(--rose);margin-bottom:10px;}
+  .nanny-actions{display:flex;gap:8px;}
+
+  /* ===== BOOKING FORM ===== */
+  .booking-section{background:var(--white);margin:12px 16px;border-radius:var(--card-r);padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+  .booking-title{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:14px;}
+  .form-row{margin-bottom:14px;}
+  .form-label{font-size:13px;color:#666;margin-bottom:6px;font-weight:500;}
+  .form-input{width:100%;height:44px;border-radius:10px;border:1.5px solid #e8e2da;padding:0 14px;font-size:14px;color:#333;background:#fafaf8;outline:none;}
+  .form-input.has-value{border-color:var(--rose);background:var(--white);}
+  .date-picker{display:flex;gap:6px;}
+  .date-cell{flex:1;height:44px;border-radius:10px;border:1.5px solid #e8e2da;display:flex;align-items:center;justify-content:center;font-size:14px;color:#333;background:#fafaf8;}
+  .date-cell.picked{border-color:var(--rose);background:var(--white);}
+  .amount-box{background:#f0faf5;border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center;}
+  .amount-label{font-size:13px;color:#666;}
+  .amount-value{font-size:20px;font-weight:700;color:var(--rose);}
+  .agree-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:12px;}
+  .agree-check{width:18px;height:18px;border-radius:4px;background:var(--rose);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;flex-shrink:0;margin-top:1px;}
+  .agree-text{font-size:12px;color:#888;line-height:1.5;}
+  .agree-link{color:var(--rose);}
+  .submit-btn{width:100%;height:50px;border-radius:14px;background:linear-gradient(135deg,var(--rose),#c04060);border:none;color:var(--white);font-size:16px;font-weight:600;cursor:pointer;}
+
+  /* ===== SUCCESS PAGE ===== */
+  .success-hero{background:linear-gradient(135deg,#fff0f4,#fff8f0);padding:40px 20px 32px;text-align:center;}
+  .success-icon{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--rose),#c04060);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 16px;}
+  .success-title{font-size:22px;font-weight:700;color:#1a1a1a;margin-bottom:8px;}
+  .success-sub{font-size:14px;color:#888;line-height:1.6;}
+  .order-card{background:var(--white);margin:16px;border-radius:var(--card-r);padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+  .order-title{font-size:14px;font-weight:600;color:#333;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #f5f1ec;}
+  .order-row{display:flex;justify-content:space-between;padding:7px 0;font-size:13px;}
+  .order-row-label{color:#888;}
+  .order-row-value{color:#333;font-weight:500;}
+  .order-row-value.highlight{color:var(--rose);}
+  .next-steps{margin:0 16px 16px;background:var(--white);border-radius:var(--card-r);padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+  .next-step-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f5f1ec;}
+  .next-step-item:last-child{border-bottom:none;}
+  .step-num{width:20px;height:20px;border-radius:50%;background:var(--rose);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;flex-shrink:0;margin-top:1px;}
+  .step-text{font-size:13px;color:#555;line-height:1.5;}
+  .action-row{display:flex;gap:10px;padding:0 16px 16px;}
+  .action-btn{flex:1;height:46px;border-radius:12px;border:none;font-size:14px;font-weight:600;cursor:pointer;}
+  .action-outline{background:#fff0f4;color:var(--rose);border:1.5px solid var(--rose);}
+  .action-primary{background:linear-gradient(135deg,var(--rose),#c04060);color:var(--white);}
+</style>
+</head>
+<body>
+<div class="demo">
+
+  <!-- ============ P28: 月子规划服务发现页 ============ -->
+  <div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">📶 🔋</div>
+      </div>
+      <div class="nav-bar">
+        <div class="nav-back" onclick="location.href='my-profile.html'" style="cursor:pointer;">‹</div>
+        <div class="nav-title">月子规划</div>
+        <div class="nav-right">🔍 搜索</div>
+      </div>
+
+      <!-- AI推荐Banner -->
+      <div class="list-hero">
+        <div class="ai-banner">
+          <div class="ai-banner-icon">🏠</div>
+          <div class="ai-banner-text">
+            <div class="ai-banner-title">月子规划小助手</div>
+            <div class="ai-banner-sub">孕28周+，现在开始规划刚刚好！优质床位紧张，早预约早安心</div>
+          </div>
+          <button class="ai-banner-btn">开始规划</button>
+        </div>
+        <!-- 孕周提示 -->
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:#888;">
+          <span>📍 北京市 · 当前孕周 14周</span>
+          <span style="color:var(--rose);">距预产期 182天</span>
+        </div>
+      </div>
+
+      <!-- Tab切换 -->
+      <div class="tab-switch">
+        <button class="tab-sw-btn active">🏥 月子中心</button>
+        <button class="tab-sw-btn">👩 月嫂服务</button>
+      </div>
+
+      <!-- 筛选条件 -->
+      <div class="filter-bar">
+        <div class="filter-chip active">综合推荐 ▾</div>
+        <div class="filter-chip">地区 ▾</div>
+        <div class="filter-chip">价格 ▾</div>
+        <div class="filter-chip">评分 4.5+ ▾</div>
+        <div class="filter-chip">特色 ▾</div>
+      </div>
+
+      <!-- 月子中心列表 -->
+      <div class="service-list">
+        <!-- AI推荐标注 -->
+        <div style="font-size:12px;color:#aaa;padding:4px 0;">🤖 AI 根据你的孕周和位置为你推荐</div>
+
+        <!-- Card 1 -->
+        <div class="service-card">
+          <div class="service-img">
+            🏥
+            <div class="service-badge">
+              <span class="badge-cert">★ 认证机构</span>
+              <span class="badge-rec">AI金牌推荐</span>
+            </div>
+          </div>
+          <div class="service-body">
+            <div class="service-name">馨和月子养护中心</div>
+            <div class="service-meta">
+              <span>📍 朝阳区</span>
+              <div class="service-rating">⭐ 4.9</div>
+              <span>328条评价</span>
+              <span>·</span>
+              <span>1200+家庭</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <div class="service-price">¥18,800<span class="service-price-unit"> 起/28天</span></div>
+              <div style="font-size:11px;color:var(--rose);">🔥 床位剩余3间</div>
+            </div>
+            <div class="service-tags">
+              <div class="service-tag">双胞胎专区</div>
+              <div class="service-tag">GDM月子餐</div>
+              <div class="service-tag">剖宫产护理</div>
+              <div class="service-tag">VIP单人间</div>
+            </div>
+            <div class="service-actions">
+              <button class="service-btn service-btn-outline">查看详情</button>
+              <button class="service-btn service-btn-primary">立即咨询</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="service-card">
+          <div class="service-img" style="background:linear-gradient(135deg,#f0f8ff,#e8eeff);">
+            🏠
+            <div class="service-badge">
+              <span class="badge-cert">★ 认证机构</span>
+            </div>
+          </div>
+          <div class="service-body">
+            <div class="service-name">安心月子护理中心</div>
+            <div class="service-meta">
+              <span>📍 海淀区</span>
+              <div class="service-rating">⭐ 4.7</div>
+              <span>215条评价</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <div class="service-price">¥12,800<span class="service-price-unit"> 起/28天</span></div>
+              <div style="font-size:11px;color:#aaa;">💬 可定制套餐</div>
+            </div>
+            <div class="service-tags">
+              <div class="service-tag">母乳喂养指导</div>
+              <div class="service-tag">产后恢复</div>
+              <div class="service-tag">高性价比</div>
+            </div>
+            <div class="service-actions">
+              <button class="service-btn service-btn-outline">查看详情</button>
+              <button class="service-btn service-btn-primary">立即咨询</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="label">P28 · 月子规划服务发现页</div>
+  </div>
+
+  <!-- ============ P29: 月子中心详情页 ============ -->
+  <div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">📶 🔋</div>
+      </div>
+      <div class="nav-bar">
+        <div class="nav-back" onclick="location.href='my-profile.html'" style="cursor:pointer;">‹</div>
+        <div class="nav-title">月子中心详情</div>
+        <div class="nav-right">❤️ 收藏</div>
+      </div>
+
+      <!-- 图片轮播 -->
+      <div class="detail-swiper">
+        🏥
+        <div style="position:absolute;top:10px;left:10px;display:flex;gap:5px;">
+          <span class="badge-cert">★ 认证机构</span>
+          <span class="badge-rec">AI金牌推荐</span>
+        </div>
+        <div class="swiper-dots">
+          <div class="swiper-dot active"></div>
+          <div class="swiper-dot"></div>
+          <div class="swiper-dot"></div>
+          <div class="swiper-dot"></div>
+          <div class="swiper-dot"></div>
+        </div>
+        <div style="position:absolute;bottom:30px;right:10px;background:rgba(0,0,0,.5);color:#fff;font-size:10px;padding:2px 7px;border-radius:8px;">1 / 5</div>
+      </div>
+
+      <!-- 基础信息 -->
+      <div class="detail-info">
+        <div class="detail-badges">
+          <span style="background:#fff0f4;color:var(--rose);font-size:10px;padding:2px 8px;border-radius:6px;font-weight:500;">GDM月子餐</span>
+          <span style="background:#f0f9f5;color:var(--green);font-size:10px;padding:2px 8px;border-radius:6px;font-weight:500;">双胞胎专区</span>
+          <span style="background:#f0f4ff;color:var(--blue);font-size:10px;padding:2px 8px;border-radius:6px;font-weight:500;">剖宫产护理</span>
+        </div>
+        <div class="detail-name">馨和月子养护中心</div>
+        <div class="detail-addr">📍 北京市朝阳区建国路88号 · 距您约3.2公里</div>
+        <div class="detail-stats">
+          <div class="detail-stat">⭐ <strong>4.9</strong> 分</div>
+          <div class="detail-stat">💬 328条评价</div>
+          <div class="detail-stat">👨‍👩‍👧 1200+家庭</div>
+        </div>
+      </div>
+
+      <!-- 套餐选择 -->
+      <div class="detail-section">
+        <div class="detail-section-title">🛏 套餐选择</div>
+        <div class="package-item">
+          <div class="package-name">标准双人间套餐</div>
+          <div class="package-price">¥18,800<span style="font-size:12px;color:#aaa;font-weight:400;"> / 28天</span></div>
+          <div class="package-desc">含三餐月子餐 · 新生儿护理 · 妈妈护理 · 产后恢复课程</div>
+        </div>
+        <div class="package-item selected">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div class="package-name">尊享单人间套餐 ✓</div>
+            <div style="font-size:10px;color:var(--rose);">已选中</div>
+          </div>
+          <div class="package-price">¥26,800<span style="font-size:12px;color:#aaa;font-weight:400;"> / 28天</span></div>
+          <div class="package-desc">独立套房 · 专属月嫂24h陪护 · GDM定制月子餐 · 全套产后恢复</div>
+        </div>
+        <div class="package-item">
+          <div class="package-name">豪华套房套餐</div>
+          <div class="package-price">¥38,000<span style="font-size:12px;color:#aaa;font-weight:400;"> / 28天</span></div>
+          <div class="package-desc">豪华亲子套房 · 高级月嫂 · 私人营养师 · VIP催乳顾问</div>
+        </div>
+      </div>
+
+      <!-- 服务内容 -->
+      <div class="detail-section">
+        <div class="detail-section-title">✨ 服务内容</div>
+        <div class="feature-grid">
+          <div class="feature-item"><span class="feature-check">✓</span>24h专业护士值班</div>
+          <div class="feature-item"><span class="feature-check">✓</span>三餐营养月子餐</div>
+          <div class="feature-item"><span class="feature-check">✓</span>新生儿护理培训</div>
+          <div class="feature-item"><span class="feature-check">✓</span>产后恢复课程</div>
+          <div class="feature-item"><span class="feature-check">✓</span>母乳喂养指导</div>
+          <div class="feature-item"><span class="feature-check">✓</span>宝宝游泳/抚触</div>
+          <div class="feature-item"><span class="feature-check">✓</span>GDM控糖餐定制</div>
+          <div class="feature-item"><span class="feature-check">✓</span>孕产期心理疏导</div>
+        </div>
+      </div>
+
+      <!-- 用户评价 -->
+      <div class="detail-section">
+        <div class="detail-section-title">💬 用户评价（328条）</div>
+        <div>
+          <div class="review-item">
+            <div class="review-header">
+              <div class="review-avatar">小</div>
+              <div>
+                <div class="review-name">小花妈妈</div>
+                <div style="display:flex;align-items:center;gap:6px;"><div class="review-stars">★★★★★</div><div class="review-week" style="font-size:10px;">孕39周产后</div></div>
+              </div>
+            </div>
+            <div class="review-text">护士非常专业，尤其是帮宝宝洗澡和睡眠训练，妈妈也恢复得特别好。我是GDM产妇，月子餐还为我专门定制了低GI食谱，血糖一直控制得很好！强烈推荐！🌸</div>
+          </div>
+          <div class="review-item">
+            <div class="review-header">
+              <div class="review-avatar" style="background:linear-gradient(135deg,#b8d8ff,#80a8ff);">若</div>
+              <div>
+                <div class="review-name">若云</div>
+                <div style="display:flex;align-items:center;gap:6px;"><div class="review-stars">★★★★★</div><div class="review-week" style="font-size:10px;">剖宫产产后</div></div>
+              </div>
+            </div>
+            <div class="review-text">剖宫产护理非常到位，伤口恢复很快。房间宽敞干净，陪同家属也有单独的休息区。整体体验超出预期，感谢每一位护士的悉心照料！💕</div>
+          </div>
+        </div>
+        <div style="text-align:center;padding-top:10px;"><span style="font-size:13px;color:var(--rose);cursor:pointer;">查看全部评价 ›</span></div>
+      </div>
+
+      <!-- 附近也在看 -->
+      <div style="padding:0 16px 10px;">
+        <div style="font-size:13px;font-weight:600;color:#333;margin-bottom:8px;">附近妈妈也在看</div>
+        <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;">
+          <div style="flex-shrink:0;width:120px;background:var(--white);border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+            <div style="height:70px;background:linear-gradient(135deg,#f0f8ff,#e0ecff);display:flex;align-items:center;justify-content:center;font-size:28px;">🏠</div>
+            <div style="padding:8px;"><div style="font-size:12px;font-weight:600;color:#333;margin-bottom:2px;">安心月子</div><div style="font-size:12px;color:var(--rose);">¥12,800起</div></div>
+          </div>
+          <div style="flex-shrink:0;width:120px;background:var(--white);border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+            <div style="height:70px;background:linear-gradient(135deg,#fff8e0,#ffe8b0);display:flex;align-items:center;justify-content:center;font-size:28px;">🌸</div>
+            <div style="padding:8px;"><div style="font-size:12px;font-weight:600;color:#333;margin-bottom:2px;">康乐产后</div><div style="font-size:12px;color:var(--rose);">¥22,000起</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:68px;"></div>
+      <div class="bottom-bar">
+        <button class="bottom-btn bottom-btn-chat">💬 咨询客服</button>
+        <button class="bottom-btn bottom-btn-book">立即预约</button>
+      </div>
+    </div>
+  </div>
+  <div class="label">P29 · 月子中心详情页</div>
+  </div>
+
+  <!-- ============ P30: 月嫂详情页 ============ -->
+  <div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">📶 🔋</div>
+      </div>
+      <div class="nav-bar">
+        <div class="nav-back" onclick="location.href='my-profile.html'" style="cursor:pointer;">‹</div>
+        <div class="nav-title">月嫂详情</div>
+        <div class="nav-right">❤️ 收藏</div>
+      </div>
+
+      <!-- 月嫂基础信息 -->
+      <div style="background:linear-gradient(135deg,#fff0f4,#fffaf8);padding:20px;border-bottom:1px solid #f0ebe4;">
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#ffb8c8,#ff8090);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;">👩</div>
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <div style="font-size:20px;font-weight:700;color:#1a1a1a;">王阿姨（高级月嫂）</div>
+            </div>
+            <div style="font-size:13px;color:#888;margin-bottom:8px;">从业12年 · 北京市 · 已服务68个家庭</div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <div style="display:flex;align-items:center;gap:3px;color:var(--gold);font-size:14px;font-weight:600;">★ 4.95</div>
+              <div style="font-size:11px;color:#aaa;">201条评价</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 资质证书 -->
+      <div class="detail-section">
+        <div class="detail-section-title">📜 资质证书（平台已核验）</div>
+        <div class="nanny-certs">
+          <div class="cert-badge">✓ 高级母婴护理师证</div>
+          <div class="cert-badge">✓ 育婴师（中级）</div>
+          <div class="cert-badge">✓ 有效健康证</div>
+          <div class="cert-badge">✓ 身份核验</div>
+          <div class="cert-badge">✓ 催乳师资质</div>
+        </div>
+      </div>
+
+      <!-- 擅长能力 -->
+      <div class="detail-section">
+        <div class="detail-section-title">💪 擅长能力</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <div class="nanny-tag" style="font-size:12px;padding:4px 10px;">双胞胎护理</div>
+          <div class="nanny-tag" style="font-size:12px;padding:4px 10px;">早产儿特护</div>
+          <div class="nanny-tag" style="font-size:12px;padding:4px 10px;">剖宫产恢复</div>
+          <div class="nanny-tag" style="font-size:12px;padding:4px 10px;">催乳通乳</div>
+          <div class="nanny-tag" style="font-size:12px;padding:4px 10px;">高龄产妇</div>
+          <div class="nanny-tag" style="font-size:12px;padding:4px 10px;">GDM月子餐</div>
+          <div class="nanny-tag" style="font-size:12px;padding:4px 10px;">新生儿黄疸护理</div>
+        </div>
+      </div>
+
+      <!-- 档期日历 -->
+      <div class="detail-section">
+        <div class="detail-section-title">📅 档期查看（近3个月）</div>
+        <div style="font-size:12px;color:#aaa;margin-bottom:8px;">绿色=可约 · 灰色=已约满</div>
+        <div style="display:flex;gap:3px;flex-wrap:wrap;">
+          <div style="padding:5px 8px;border-radius:8px;font-size:11px;background:#f0ebe4;color:#bbb;font-weight:500;">4月</div>
+          <div style="padding:5px 8px;border-radius:8px;font-size:11px;background:#f0ebe4;color:#bbb;">已约满</div>
+          <div style="padding:5px 8px;border-radius:8px;font-size:11px;background:#e8f5ee;color:var(--green);font-weight:500;">5月</div>
+          <div style="padding:5px 8px;border-radius:8px;font-size:11px;background:#e8f5ee;color:var(--green);">5/1可约</div>
+          <div style="padding:5px 8px;border-radius:8px;font-size:11px;background:#e8f5ee;color:var(--green);font-weight:500;">6月</div>
+          <div style="padding:5px 8px;border-radius:8px;font-size:11px;background:#e8f5ee;color:var(--green);">6/1可约</div>
+          <div style="padding:5px 8px;border-radius:8px;font-size:11px;background:#e8f5ee;color:var(--green);font-weight:500;">7月</div>
+          <div style="padding:5px 8px;border-radius:8px;font-size:11px;background:#e8f5ee;color:var(--green);">7/1可约</div>
+          <div style="padding:5px 8px;border-radius:8px;font-size:11px;background:#e8f5ee;color:var(--green);font-weight:500;">8月</div>
+          <div style="padding:5px 8px;border-radius:8px;font-size:11px;background:#e8f5ee;color:var(--green);">8/1可约 ✓</div>
+        </div>
+        <div style="background:#f0faf5;border-radius:8px;padding:8px 10px;margin-top:8px;font-size:12px;color:#2a6a50;">
+          💡 根据你的预产期（2026年8月15日），推荐预约 <strong>8月1日档期</strong>
+        </div>
+      </div>
+
+      <!-- 服务价格 -->
+      <div class="detail-section">
+        <div class="detail-section-title">💰 服务价格</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:22px;font-weight:700;color:var(--rose);">¥11,000<span style="font-size:13px;color:#aaa;font-weight:400;"> / 月</span></div>
+            <div style="font-size:12px;color:#aaa;margin-top:2px;">试用期7天起 · 提前30天预约优惠9折</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:11px;color:#aaa;">服务保障</div>
+            <div style="font-size:12px;color:var(--green);font-weight:500;">平台担保</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 评价 -->
+      <div class="detail-section">
+        <div class="detail-section-title">💬 用户评价（201条）</div>
+        <div class="review-item">
+          <div class="review-header">
+            <div class="review-avatar" style="background:linear-gradient(135deg,#ffd0d8,#ffb0c0);">糖</div>
+            <div>
+              <div class="review-name">糖糖妈妈</div>
+              <div style="display:flex;align-items:center;gap:6px;"><div class="review-stars">★★★★★</div><div class="review-week">GDM产妇</div></div>
+            </div>
+          </div>
+          <div class="review-text">王阿姨太棒了！我是GDM产妇，她每天专门为我准备低GI低糖食材，产后月子里血糖一直稳定。宝宝护理也很用心，强烈推荐有GDM的妈妈选她！</div>
+        </div>
+      </div>
+
+      <div style="height:68px;"></div>
+      <div class="bottom-bar">
+        <button class="bottom-btn bottom-btn-chat">💬 联系月嫂</button>
+        <button class="bottom-btn bottom-btn-book">意向预约</button>
+      </div>
+    </div>
+  </div>
+  <div class="label">P30 · 月嫂详情页</div>
+  </div>
+
+  <!-- ============ P31: 预约填写页 ============ -->
+  <div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">📶 🔋</div>
+      </div>
+      <div class="nav-bar">
+        <div class="nav-back" onclick="location.href='my-profile.html'" style="cursor:pointer;">‹</div>
+        <div class="nav-title">预约填写</div>
+        <div class="nav-right"></div>
+      </div>
+
+      <!-- 预约信息摘要 -->
+      <div style="background:linear-gradient(135deg,#fff0f4,#fff8f8);padding:14px 20px;border-bottom:1px solid #f0ebe4;display:flex;gap:12px;align-items:center;">
+        <div style="width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#fff0f4,#ffd8e0);display:flex;align-items:center;justify-content:center;font-size:24px;">🏥</div>
+        <div>
+          <div style="font-size:14px;font-weight:600;color:#1a1a1a;">馨和月子养护中心</div>
+          <div style="font-size:12px;color:#aaa;margin-top:2px;">尊享单人间套餐 · ¥26,800 / 28天</div>
+        </div>
+      </div>
+
+      <!-- 表单 -->
+      <div class="booking-section">
+        <div class="booking-title">👤 入住信息</div>
+        <div class="form-row">
+          <div class="form-label">入住日期</div>
+          <div class="date-picker">
+            <input class="form-input has-value" value="2026年8月18日" style="flex:1;">
+          </div>
+          <div style="font-size:11px;color:#aaa;margin-top:4px;">💡 已根据你的预产期（8月15日）自动推算为产后第3天</div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">入住天数</div>
+          <div class="radio-group" style="display:flex;gap:8px;flex-wrap:wrap;">
+            <div style="padding:7px 14px;border-radius:20px;border:1.5px solid var(--rose);background:#fff0f4;color:var(--rose);font-size:12px;cursor:pointer;">28天</div>
+            <div style="padding:7px 14px;border-radius:20px;border:1.5px solid #e0d8d0;font-size:12px;color:#666;cursor:pointer;">42天</div>
+            <div style="padding:7px 14px;border-radius:20px;border:1.5px solid #e0d8d0;font-size:12px;color:#666;cursor:pointer;">自定义</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">分娩方式</div>
+          <div style="display:flex;gap:8px;">
+            <div style="padding:7px 14px;border-radius:20px;border:1.5px solid #e0d8d0;font-size:12px;color:#666;cursor:pointer;">顺产</div>
+            <div style="padding:7px 14px;border-radius:20px;border:1.5px solid var(--rose);background:#fff0f4;color:var(--rose);font-size:12px;cursor:pointer;">剖宫产</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">是否双胎</div>
+          <div style="display:flex;gap:8px;">
+            <div style="padding:7px 14px;border-radius:20px;border:1.5px solid #e0d8d0;font-size:12px;color:#666;cursor:pointer;">单胎</div>
+            <div style="padding:7px 14px;border-radius:20px;border:1.5px solid #e0d8d0;font-size:12px;color:#666;cursor:pointer;">双胎</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">特殊需求（选填）</div>
+          <textarea style="width:100%;height:60px;border-radius:10px;border:1.5px solid #e8e2da;padding:10px 14px;font-size:13px;background:#fafaf8;resize:none;outline:none;color:#555;" placeholder="如：我有妊娠糖尿病，需要GDM定制月子餐">我有妊娠糖尿病（GDM），需要低GI控糖月子餐</textarea>
+        </div>
+      </div>
+
+      <div class="booking-section">
+        <div class="booking-title">📞 联系信息</div>
+        <div class="form-row">
+          <div class="form-label">联系人姓名</div>
+          <input class="form-input has-value" value="张小明">
+        </div>
+        <div class="form-row">
+          <div class="form-label">手机号码</div>
+          <input class="form-input has-value" value="138****8888">
+        </div>
+      </div>
+
+      <div class="booking-section">
+        <div class="booking-title">💰 费用确认</div>
+        <div class="amount-box">
+          <div>
+            <div class="amount-label">尊享单人间套餐 · 28天</div>
+            <div style="font-size:11px;color:#aaa;margin-top:2px;">V1.0意向预约无需支付定金</div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:#aaa;text-align:right;">意向预约</div>
+            <div class="amount-value">免费</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:#aaa;margin-top:8px;line-height:1.6;">· 提交后机构将在24小时内电话回访确认<br>· 确认后可签订服务协议并支付定金锁定床位</div>
+      </div>
+
+      <div style="padding:0 16px 8px;">
+        <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:12px;">
+          <div style="width:18px;height:18px;border-radius:4px;background:var(--rose);display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;flex-shrink:0;margin-top:1px;">✓</div>
+          <div style="font-size:12px;color:#888;line-height:1.5;">我已阅读并同意 <span style="color:var(--rose);">《月子服务预约协议》</span> 和 <span style="color:var(--rose);">《用户隐私政策》</span></div>
+        </div>
+        <button class="submit-btn">提交预约申请</button>
+      </div>
+    </div>
+  </div>
+  <div class="label">P31 · 预约填写页</div>
+  </div>
+
+  <!-- ============ P32: 预约成功页 ============ -->
+  <div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="status-bar">
+        <span class="status-time">9:43</span>
+        <div class="status-icons">📶 🔋</div>
+      </div>
+
+      <div class="success-hero">
+        <div class="success-icon">🎉</div>
+        <div class="success-title">预约申请已提交！</div>
+        <div class="success-sub">机构将在 <strong>24小时内</strong> 电话联系你<br>确认预约详情，请保持手机畅通 🌸</div>
+      </div>
+
+      <!-- 订单信息 -->
+      <div class="order-card">
+        <div class="order-title">📋 预约信息</div>
+        <div class="order-row"><div class="order-row-label">机构名称</div><div class="order-row-value">馨和月子养护中心</div></div>
+        <div class="order-row"><div class="order-row-label">套餐</div><div class="order-row-value">尊享单人间套餐</div></div>
+        <div class="order-row"><div class="order-row-label">入住日期</div><div class="order-row-value">2026年8月18日</div></div>
+        <div class="order-row"><div class="order-row-label">入住天数</div><div class="order-row-value">28天</div></div>
+        <div class="order-row"><div class="order-row-label">预约状态</div><div class="order-row-value highlight">待确认</div></div>
+        <div class="order-row"><div class="order-row-label">预约编号</div><div class="order-row-value" style="font-size:12px;color:#aaa;">MOM2026031500023</div></div>
+      </div>
+
+      <!-- 后续步骤 -->
+      <div class="next-steps">
+        <div style="font-size:13px;font-weight:600;color:#333;margin-bottom:8px;">📌 接下来你需要做：</div>
+        <div class="next-step-item">
+          <div class="step-num">1</div>
+          <div class="step-text"><strong>等待回访</strong>：机构24小时内致电，确认入住时间和特殊需求（GDM月子餐等）</div>
+        </div>
+        <div class="next-step-item">
+          <div class="step-num">2</div>
+          <div class="step-text"><strong>签署协议</strong>：确认后签订月子服务协议，支付定金锁档</div>
+        </div>
+        <div class="next-step-item">
+          <div class="step-num">3</div>
+          <div class="step-text"><strong>孕期提醒</strong>：我们将在孕32周和孕36周提醒你跟进预约进度</div>
+        </div>
+      </div>
+
+      <!-- 操作按钮 -->
+      <div class="action-row">
+        <button class="action-btn action-outline">查看我的预约</button>
+        <button class="action-btn action-primary" onclick="location.href='home-tab.html'">返回首页</button>
+      </div>
+
+      <!-- 幸孕币奖励 -->
+      <div style="margin:0 16px 20px;background:linear-gradient(135deg,#fff8e0,#fff0d0);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px;">
+        <div style="font-size:24px;">🪙</div>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:#a06020;">恭喜获得幸孕币奖励！</div>
+          <div style="font-size:12px;color:#c08030;margin-top:2px;">完成月子预约 +200 幸孕币 · 服务结束后评价再 +30 幸孕币</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="label">P32 · 预约成功页</div>
+  </div>
+
+</div>
+</body>
+</html>

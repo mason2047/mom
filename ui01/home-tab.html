@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>孕期健康管理 - 首页 Home Tab</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #f0ece6; font-family: -apple-system, 'PingFang SC', sans-serif; display: flex; flex-wrap: wrap; gap: 24px; padding: 24px; justify-content: center; }
+
+  /* ===== Phone Frame ===== */
+  .phone { width: 375px; background: #fff; border-radius: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.18); overflow: hidden; position: relative; flex-shrink: 0; }
+  .phone-label { text-align: center; font-size: 13px; color: #888; margin-bottom: 8px; font-weight: 600; }
+  .status-bar { background: #fdf6ee; height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; font-size: 12px; color: #555; }
+  .status-bar .time { font-weight: 700; }
+  .status-bar .icons { display: flex; gap: 4px; align-items: center; font-size: 11px; }
+  .screen { overflow-y: auto; max-height: 720px; background: #fdf6ee; }
+  .screen::-webkit-scrollbar { display: none; }
+
+  /* Tab Bar */
+  .tab-bar { position: sticky; bottom: 0; background: #fff; border-top: 1px solid #eee; display: flex; padding: 6px 0 10px; z-index: 100; }
+  .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
+  .tab-item .tab-icon { font-size: 22px; }
+  .tab-item .tab-text { font-size: 10px; color: #aaa; }
+  .tab-item.active .tab-text { color: #e87c3e; }
+  .tab-item.active .tab-icon { filter: none; }
+
+  /* ===== Page 1: Home ===== */
+  /* Top Banner */
+  .home-banner {
+    background: linear-gradient(135deg, #fdf0e0 0%, #fde8cc 50%, #fce0ba 100%);
+    padding: 16px 20px 0;
+    position: relative;
+    overflow: hidden;
+    min-height: 160px;
+  }
+  .banner-left { position: relative; z-index: 2; }
+  .banner-date { font-size: 12px; color: #b8895a; margin-bottom: 4px; }
+  .banner-week { font-size: 28px; font-weight: 800; color: #5a3010; line-height: 1.1; }
+  .banner-week span { font-size: 16px; font-weight: 600; color: #8a5a30; }
+  .banner-sub { font-size: 11px; color: #b8895a; margin-top: 6px; }
+  .banner-btn { display: inline-block; margin-top: 10px; padding: 5px 12px; background: rgba(232,124,62,0.15); border-radius: 20px; font-size: 11px; color: #e87c3e; border: 1px solid rgba(232,124,62,0.3); }
+  .pregnant-figure {
+    position: absolute; right: 16px; bottom: 0; width: 110px; height: 130px;
+    display: flex; align-items: flex-end; justify-content: center;
+  }
+  .figure-svg { width: 100%; height: 100%; }
+
+  /* Bubble Section */
+  .bubble-section {
+    background: linear-gradient(135deg, #fdf0e0 0%, #fce8cc 100%);
+    padding: 16px 20px 20px;
+    position: relative;
+  }
+  .bubble-section-title { font-size: 13px; font-weight: 700; color: #5a3010; margin-bottom: 12px; }
+  .bubbles-container { position: relative; height: 190px; }
+  .bubble {
+    position: absolute; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .bubble-main {
+    width: 140px; height: 140px; right: 10px; top: 10px;
+    background: linear-gradient(135deg, #fde8c8, #fcd4a0);
+    box-shadow: 0 0 0 6px rgba(232,124,62,0.15), 0 0 0 12px rgba(232,124,62,0.07);
+    animation: breathe 3s ease-in-out infinite, pulse-glow 0.83s ease-in-out infinite;
+  }
+  .bubble-mid {
+    width: 90px; height: 90px; left: 20px; top: 20px;
+    background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+    animation: float1 2.8s ease-in-out infinite;
+  }
+  .bubble-small {
+    width: 60px; height: 60px; left: 50px; bottom: 10px;
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    animation: float2 3.4s ease-in-out infinite;
+  }
+  .bubble-main-inner { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; }
+  .fetus-emoji { font-size: 48px; }
+  .fetus-week-label { font-size: 9px; color: #8a5a30; margin-top: 2px; font-weight: 600; }
+  .bubble-mid-inner { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .fruit-emoji { font-size: 28px; }
+  .fruit-label { font-size: 8px; color: #2e7d32; font-weight: 700; text-align: center; line-height: 1.2; }
+
+  @keyframes breathe { 0%,100%{ transform: scale(1); } 50%{ transform: scale(1.03); } }
+  @keyframes pulse-glow { 0%,100%{ box-shadow: 0 0 0 4px rgba(232,124,62,0.2),0 0 0 10px rgba(232,124,62,0.08); } 50%{ box-shadow: 0 0 0 8px rgba(232,124,62,0.3),0 0 0 18px rgba(232,124,62,0.1); } }
+  @keyframes float1 { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-4px); } }
+  @keyframes float2 { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(3px); } }
+
+  /* Baby Talk Card */
+  .baby-talk-card {
+    margin: 0 16px 12px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border-left: 4px solid #e87c3e;
+  }
+  .baby-talk-title { font-size: 12px; font-weight: 700; color: #e87c3e; margin-bottom: 8px; display: flex; align-items: center; gap: 4px; }
+  .baby-talk-body { display: flex; gap: 10px; }
+  .baby-img-box { width: 64px; height: 64px; background: linear-gradient(135deg, #fde8c8, #fcd4a0); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 30px; flex-shrink: 0; }
+  .baby-talk-text { font-size: 12px; color: #555; line-height: 1.6; flex: 1; }
+  .baby-talk-text.collapsed { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .expand-btn { font-size: 11px; color: #e87c3e; cursor: pointer; margin-top: 4px; display: inline-block; }
+
+  /* Mom Health Card */
+  .mom-card {
+    margin: 0 16px 12px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    cursor: pointer;
+  }
+  .mom-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .mom-card-title { font-size: 12px; font-weight: 700; color: #d4697a; display: flex; align-items: center; gap: 4px; }
+  .mom-card-arrow { font-size: 12px; color: #ccc; }
+  .mom-card-text { font-size: 12px; color: #666; line-height: 1.65; }
+  .mom-card-tag { display: inline-block; padding: 2px 8px; background: #fde8e8; color: #d4697a; border-radius: 10px; font-size: 10px; margin-top: 8px; }
+
+  /* Progress Bar */
+  .progress-section {
+    margin: 0 16px 12px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .progress-countdown { text-align: center; font-size: 14px; color: #5a3010; font-weight: 600; margin-bottom: 12px; }
+  .progress-bar-wrap { position: relative; padding: 0 4px; }
+  .progress-track { height: 6px; background: #f0e8dc; border-radius: 3px; position: relative; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #f4b382, #e87c3e); border-radius: 3px; width: 35%; position: relative; }
+  .progress-dot { width: 14px; height: 14px; background: #e87c3e; border: 3px solid #fff; border-radius: 50%; position: absolute; right: -7px; top: -4px; box-shadow: 0 0 0 3px rgba(232,124,62,0.2); }
+  .progress-labels { display: flex; justify-content: space-between; margin-top: 8px; }
+  .progress-label { font-size: 10px; color: #aaa; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .progress-label.active { color: #e87c3e; font-weight: 700; }
+  .progress-label-dot { width: 6px; height: 6px; border-radius: 50%; background: #ddd; }
+  .progress-label.active .progress-label-dot { background: #e87c3e; }
+  .progress-label.done .progress-label-dot { background: #f4b382; }
+  .progress-label.done { color: #f4b382; }
+  .progress-week-node { position: absolute; display: flex; flex-direction: column; align-items: center; }
+
+  /* Antenatal Card */
+  .antenatal-section { padding: 0 16px; margin-bottom: 12px; }
+  .section-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .section-title { font-size: 14px; font-weight: 700; color: #333; }
+  .section-more { font-size: 11px; color: #e87c3e; }
+
+  .antenatal-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    margin-bottom: 10px;
+  }
+  .antenatal-card-header { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+  .antenatal-tag { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+  .antenatal-tag.key { background: #fff3e0; color: #e87c3e; }
+  .antenatal-tag.plan { background: #e8f5e9; color: #388e3c; }
+  .antenatal-week-label { font-size: 12px; color: #888; }
+  .antenatal-items { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .antenatal-item { padding: 4px 10px; background: #fdf6ee; border-radius: 20px; font-size: 11px; color: #5a3010; border: 1px solid #f0e0c8; }
+  .antenatal-item.important { background: #fff3e0; color: #e87c3e; border-color: #f4b382; }
+  .antenatal-divider { height: 1px; background: #f5f0ea; margin: 10px 0; }
+  .antenatal-plan-row { display: flex; align-items: center; justify-content: space-between; }
+  .antenatal-plan-info { }
+  .antenatal-plan-title { font-size: 12px; font-weight: 700; color: #333; margin-bottom: 3px; }
+  .antenatal-plan-date { font-size: 11px; color: #888; }
+  .antenatal-record-btn { padding: 8px 16px; background: linear-gradient(135deg, #f4b382, #e87c3e); color: #fff; border-radius: 20px; font-size: 12px; font-weight: 700; border: none; cursor: pointer; box-shadow: 0 3px 10px rgba(232,124,62,0.35); }
+
+  /* Health Record Quick Access */
+  .quick-health { padding: 0 16px; margin-bottom: 12px; }
+  .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .quick-card { background: #fff; border-radius: 14px; padding: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+  .quick-card-head { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+  .quick-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+  .quick-card-name { font-size: 11px; font-weight: 700; color: #333; }
+  .quick-value { font-size: 18px; font-weight: 800; color: #333; }
+  .quick-unit { font-size: 10px; color: #aaa; margin-left: 2px; }
+  .quick-hint { font-size: 10px; color: #aaa; margin-top: 2px; }
+  .quick-hint.warn { color: #e87c3e; }
+  .quick-add-btn { display: block; margin-top: 6px; padding: 4px 0; background: #fdf6ee; border-radius: 8px; font-size: 10px; color: #e87c3e; text-align: center; border: 1px dashed rgba(232,124,62,0.4); }
+
+  /* Knowledge page styles */
+  .knowledge-page .page-nav { background: #fdf6ee; padding: 12px 16px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #f0e8dc; }
+  .knowledge-page .back-btn { font-size: 18px; color: #e87c3e; cursor: pointer; }
+  .knowledge-page .page-nav-title { font-size: 16px; font-weight: 700; color: #333; }
+  .week-tab-scroll { display: flex; gap: 8px; padding: 10px 16px; overflow-x: auto; background: #fff; }
+  .week-tab-scroll::-webkit-scrollbar { display: none; }
+  .week-chip { padding: 5px 14px; border-radius: 20px; font-size: 12px; color: #888; background: #f5f0ea; white-space: nowrap; cursor: pointer; }
+  .week-chip.active { background: #e87c3e; color: #fff; font-weight: 700; }
+  .content-tab-row { display: flex; padding: 0 16px; border-bottom: 1px solid #f0e8dc; background: #fff; }
+  .content-tab { flex: 1; padding: 10px 0; text-align: center; font-size: 13px; color: #aaa; cursor: pointer; }
+  .content-tab.active { color: #e87c3e; font-weight: 700; border-bottom: 2px solid #e87c3e; }
+  .knowledge-hero { background: linear-gradient(135deg, #fdf0e0, #fde8cc); padding: 20px; display: flex; align-items: center; gap: 12px; }
+  .knowledge-hero-text h2 { font-size: 20px; font-weight: 800; color: #5a3010; }
+  .knowledge-hero-text p { font-size: 12px; color: #b8895a; margin-top: 4px; }
+  .knowledge-hero-fig { font-size: 60px; }
+  .accordion-item { background: #fff; margin: 8px 16px 0; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+  .accordion-header { padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+  .accordion-header-left { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #333; }
+  .accordion-icon { font-size: 18px; }
+  .accordion-arrow { font-size: 12px; color: #ccc; transition: transform 0.2s; }
+  .accordion-arrow.open { transform: rotate(180deg); color: #e87c3e; }
+  .accordion-body { padding: 0 16px 14px; font-size: 12px; color: #666; line-height: 1.8; }
+  .accordion-body .symptom { margin-bottom: 8px; }
+  .accordion-body .symptom strong { color: #333; }
+  .accordion-body .warn-item { color: #e53935; font-size: 11px; padding: 4px 10px; background: #fff5f5; border-radius: 8px; margin: 4px 0; display: block; }
+  .nutrition-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+  .nutrition-emoji { font-size: 20px; }
+  .nutrition-text { font-size: 11px; color: #555; }
+  .checklist-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #f5f0ea; }
+  .check-box { width: 18px; height: 18px; border-radius: 5px; border: 2px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; }
+  .check-box.done { background: #e87c3e; border-color: #e87c3e; color: #fff; }
+  .checklist-text { font-size: 11px; color: #555; flex: 1; }
+  .checklist-action { padding: 3px 8px; background: #fff3e0; border-radius: 10px; font-size: 10px; color: #e87c3e; white-space: nowrap; }
+  .ai-float-btn { position: absolute; right: 16px; bottom: 80px; width: 48px; height: 48px; background: linear-gradient(135deg, #f4b382, #e87c3e); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 4px 14px rgba(232,124,62,0.4); cursor: pointer; z-index: 20; }
+  .ai-badge { position: absolute; top: -3px; right: -3px; width: 14px; height: 14px; background: #ff4444; border-radius: 50%; border: 2px solid #fff; }
+  .baby-dev-section { margin: 8px 16px 0; background: #fff; border-radius: 14px; padding: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+  .baby-dev-hero { display: flex; gap: 12px; align-items: center; }
+  .baby-dev-3d { width: 80px; height: 80px; background: linear-gradient(135deg, #fde8c8, #fcd4a0); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; animation: breathe 3s ease-in-out infinite; }
+  .baby-dev-info h3 { font-size: 16px; font-weight: 800; color: #5a3010; }
+  .baby-dev-info .size-row { font-size: 11px; color: #888; margin-top: 4px; display: flex; gap: 10px; }
+  .baby-dev-info .fruit-compare { font-size: 11px; color: #2e7d32; margin-top: 4px; }
+  .baby-quote { background: #fdf6ee; border-radius: 10px; padding: 10px 12px; margin-top: 12px; font-size: 12px; color: #5a3010; line-height: 1.7; font-style: italic; border-left: 3px solid #e87c3e; }
+  .baby-highlights { margin-top: 10px; }
+  .baby-highlights-title { font-size: 11px; font-weight: 700; color: #888; margin-bottom: 6px; }
+  .highlight-item { display: flex; align-items: flex-start; gap: 6px; font-size: 11px; color: #555; padding: 3px 0; }
+  .highlight-dot { width: 5px; height: 5px; border-radius: 50%; background: #e87c3e; margin-top: 4px; flex-shrink: 0; }
+
+  .bottom-space { height: 20px; }
+</style>
+</head>
+<body>
+
+<!-- ============ Page 1: Home Tab ============ -->
+<div>
+<div class="phone-label">P01 · 首页 Home Tab（孕14周）</div>
+<div class="phone">
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="icons">
+      <span>●●●</span>
+      <span>WiFi</span>
+      <span>🔋</span>
+    </div>
+  </div>
+  <div class="screen">
+    <!-- Top Banner -->
+    <div class="home-banner">
+      <div class="banner-left">
+        <div class="banner-date">2026年3月6日</div>
+        <div class="banner-week">孕<span style="font-size:32px;color:#5a3010;">14</span>周<span>3天</span></div>
+        <div class="banner-sub">孕中期 · 距预产期还有 182 天</div>
+        <div class="banner-btn" onclick="location.href='mom-assistant.html'" style="cursor:pointer;">查看孕期知识 ›</div>
+      </div>
+      <div class="pregnant-figure">
+        <svg class="figure-svg" viewBox="0 0 110 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- body -->
+          <ellipse cx="55" cy="95" rx="30" ry="28" fill="#fcd4a0"/>
+          <!-- belly bump -->
+          <ellipse cx="62" cy="100" rx="22" ry="20" fill="#f4b382"/>
+          <!-- head -->
+          <circle cx="55" cy="52" r="22" fill="#fcd4a0"/>
+          <!-- hair -->
+          <path d="M33 48 Q35 28 55 26 Q75 28 77 48" fill="#8B5E3C"/>
+          <!-- face -->
+          <circle cx="47" cy="52" r="2" fill="#8B5E3C"/>
+          <circle cx="63" cy="52" r="2" fill="#8B5E3C"/>
+          <path d="M49 59 Q55 64 61 59" stroke="#c97b5a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <!-- rosy cheeks -->
+          <circle cx="43" cy="58" r="5" fill="rgba(255,150,120,0.25)"/>
+          <circle cx="67" cy="58" r="5" fill="rgba(255,150,120,0.25)"/>
+          <!-- arms -->
+          <path d="M25 85 Q18 95 22 108" stroke="#fcd4a0" stroke-width="8" stroke-linecap="round" fill="none"/>
+          <path d="M85 85 Q92 95 88 108" stroke="#fcd4a0" stroke-width="8" stroke-linecap="round" fill="none"/>
+          <!-- legs -->
+          <path d="M42 120 L38 130" stroke="#fcd4a0" stroke-width="9" stroke-linecap="round"/>
+          <path d="M68 120 L72 130" stroke="#fcd4a0" stroke-width="9" stroke-linecap="round"/>
+          <!-- dress -->
+          <path d="M25 85 Q28 70 55 68 Q82 70 85 85 L82 123 Q55 128 28 123 Z" fill="#f8c4d4" opacity="0.7"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Bubble Section -->
+    <div class="bubble-section">
+      <div class="bubble-section-title">🫧 本周健康</div>
+      <div class="bubbles-container">
+        <div class="bubble bubble-main">
+          <div class="bubble-main-inner">
+            <div class="fetus-emoji">👶</div>
+            <div class="fetus-week-label">孕14周胎儿</div>
+          </div>
+        </div>
+        <div class="bubble bubble-mid">
+          <div class="bubble-mid-inner">
+            <div class="fruit-emoji">🍇</div>
+            <div class="fruit-label">宝宝大小<br>像山竹</div>
+          </div>
+        </div>
+        <div class="bubble bubble-small">
+          <div style="font-size:22px;">❤️</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Baby Talk Card -->
+    <div class="baby-talk-card">
+      <div class="baby-talk-title">💬 宝宝说</div>
+      <div class="baby-talk-body">
+        <div class="baby-img-box">🍇</div>
+        <div>
+          <div class="baby-talk-text collapsed" id="babyText">妈妈，我现在有8.7cm啦，大概一颗山竹那么大！我的手指头和脚趾头都长出来了，我最近很喜欢伸懒腰，你感受到了吗？我还开始会做小表情了，会皱眉和微笑哦，是不是很厉害？</div>
+          <span class="expand-btn" onclick="toggleText()">展开 ›</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mom Health Card -->
+    <div class="mom-card">
+      <div class="mom-card-header">
+        <div class="mom-card-title">🤰 妈妈健康</div>
+        <div class="mom-card-arrow">›</div>
+      </div>
+      <div class="mom-card-text">进入孕中期第一周，你可能会发现孕早期的恶心感正在慢慢减轻，身体终于迎来了相对舒适的阶段～本周宝宝已经有山竹那么大，开始会做鬼脸了！</div>
+      <div class="mom-card-tag" onclick="location.href='mom-assistant.html'" style="cursor:pointer;">👆 点击查看本周详情</div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-section">
+      <div class="progress-countdown">🌱 距离预产期 182 天 🌱</div>
+      <div class="progress-bar-wrap">
+        <div class="progress-track">
+          <div class="progress-fill">
+            <div class="progress-dot"></div>
+          </div>
+        </div>
+        <div class="progress-labels">
+          <div class="progress-label done">
+            <div class="progress-label-dot"></div>
+            <div>孕早期</div>
+            <div style="font-size:9px;color:#ccc;">6~13周</div>
+          </div>
+          <div class="progress-label active">
+            <div class="progress-label-dot"></div>
+            <div>孕中期</div>
+            <div style="font-size:9px;color:#e87c3e;">14~27周</div>
+          </div>
+          <div class="progress-label">
+            <div class="progress-label-dot"></div>
+            <div>孕晚期</div>
+            <div style="font-size:9px;color:#ccc;">28~40周</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Antenatal Card -->
+    <div class="antenatal-section">
+      <div class="section-title-row">
+        <div class="section-title">🗓️ 产检信息</div>
+        <div class="section-more" onclick="location.href='checkup-calendar.html'" style="cursor:pointer;">查看全部 ›</div>
+      </div>
+      <div class="antenatal-card">
+        <div class="antenatal-card-header">
+          <div class="antenatal-tag key">产检重点</div>
+          <div class="antenatal-week-label">孕14周</div>
+        </div>
+        <div class="antenatal-items">
+          <div class="antenatal-item important">中期唐筛 ⚠️</div>
+          <div class="antenatal-item">无创DNA</div>
+          <div class="antenatal-item">血常规</div>
+          <div class="antenatal-item">尿常规</div>
+          <div class="antenatal-item">B超</div>
+        </div>
+        <div style="font-size:11px;color:#e87c3e;padding:4px 0 8px;background:#fff9f0;border-radius:8px;padding:6px 10px;margin-bottom:8px;">
+          ⚠️ 唐筛窗口期 14~20周，本周是最佳时机，请尽快预约
+        </div>
+        <div class="antenatal-divider"></div>
+        <div class="antenatal-plan-row">
+          <div class="antenatal-plan-info">
+            <div class="antenatal-plan-title">孕15周产检计划</div>
+            <div class="antenatal-plan-date">2026年3月18日（周三）</div>
+          </div>
+          <button class="antenatal-record-btn" onclick="location.href='checkup-calendar.html'">记录产检</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Health Records -->
+    <div class="quick-health">
+      <div class="section-title-row">
+        <div class="section-title">📊 健康记录</div>
+        <div class="section-more" onclick="location.href='health-records.html'" style="cursor:pointer;">查看趋势 ›</div>
+      </div>
+      <div class="quick-grid">
+        <div class="quick-card">
+          <div class="quick-card-head">
+            <div class="quick-icon" style="background:#fff3e0;">⚖️</div>
+            <div class="quick-card-name">体重</div>
+          </div>
+          <div><span class="quick-value">58.2</span><span class="quick-unit">kg</span></div>
+          <div class="quick-hint">本周+0.3kg ✓</div>
+          <div class="quick-add-btn">+ 记录今日体重</div>
+        </div>
+        <div class="quick-card">
+          <div class="quick-card-head">
+            <div class="quick-icon" style="background:#e8f5e9;">🩺</div>
+            <div class="quick-card-name">血压</div>
+          </div>
+          <div><span class="quick-value" style="font-size:14px;">118/76</span><span class="quick-unit">mmHg</span></div>
+          <div class="quick-hint" style="color:#388e3c;">正常范围 ✓</div>
+          <div class="quick-add-btn">+ 记录血压</div>
+        </div>
+        <div class="quick-card">
+          <div class="quick-card-head">
+            <div class="quick-icon" style="background:#fce4ec;">🩸</div>
+            <div class="quick-card-name">血糖</div>
+          </div>
+          <div><span class="quick-value" style="font-size:14px;">5.2</span><span class="quick-unit">mmol/L</span></div>
+          <div class="quick-hint" style="color:#388e3c;">空腹正常 ✓</div>
+          <div class="quick-add-btn">+ 记录血糖</div>
+        </div>
+        <div class="quick-card">
+          <div class="quick-card-head">
+            <div class="quick-icon" style="background:#e3f2fd;">👶</div>
+            <div class="quick-card-name">胎动</div>
+          </div>
+          <div><span class="quick-value" style="font-size:14px;">—</span></div>
+          <div class="quick-hint warn">28周后开始记录</div>
+          <div class="quick-add-btn" style="color:#ccc;border-color:#eee;">暂不可用</div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-space"></div>
+
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+      <div class="tab-item active">
+        <div class="tab-icon">🏠</div>
+        <div class="tab-text" style="color:#e87c3e;">首页</div>
+      </div>
+      <div class="tab-item" onclick="location.href='mom-assistant.html'" style="cursor:pointer;">
+        <div class="tab-icon">🤖</div>
+        <div class="tab-text">MOM助手</div>
+      </div>
+      <div class="tab-item" onclick="location.href='my-profile.html'" style="cursor:pointer;">
+        <div class="tab-icon">👤</div>
+        <div class="tab-text">我的</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ============ Page 2: 妈妈健康详情页 ============ -->
+<div>
+<div class="phone-label">P02 · 妈妈健康详情页（孕14周）</div>
+<div class="phone knowledge-page">
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+  </div>
+  <div class="screen">
+    <div class="page-nav">
+      <span class="back-btn" onclick="location.href='home-tab.html'" style="cursor:pointer;">‹</span>
+      <span class="page-nav-title">孕期知识</span>
+    </div>
+    <div class="week-tab-scroll">
+      <div class="week-chip">孕12周</div>
+      <div class="week-chip">孕13周</div>
+      <div class="week-chip active">孕14周</div>
+      <div class="week-chip">孕15周</div>
+      <div class="week-chip">孕16周</div>
+    </div>
+    <div class="content-tab-row">
+      <div class="content-tab active">妈妈健康</div>
+      <div class="content-tab">宝宝发育</div>
+    </div>
+    <div class="knowledge-hero">
+      <div class="knowledge-hero-fig">🤰</div>
+      <div class="knowledge-hero-text">
+        <h2>孕14周</h2>
+        <p>妈妈健康 · 本周详情</p>
+        <p style="margin-top:4px;font-size:11px;color:#b8895a;">孕中期第1周</p>
+      </div>
+    </div>
+
+    <!-- Accordion: 本周健康概述 -->
+    <div class="accordion-item">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <div class="accordion-header-left"><span class="accordion-icon">📋</span>本周健康概述</div>
+        <span class="accordion-arrow open">▾</span>
+      </div>
+      <div class="accordion-body">
+        进入孕中期第一周，你可能会发现孕早期的恶心感正在慢慢减轻，身体终于迎来了相对舒适的阶段～本周宝宝已经有山竹那么大，开始会做鬼脸了！这周最值得关注的是：<strong>记得预约唐氏筛查</strong>，窗口期14~20周，错过需要更复杂的检查哦。
+      </div>
+    </div>
+
+    <!-- Accordion: 身体变化 -->
+    <div class="accordion-item">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <div class="accordion-header-left"><span class="accordion-icon">🩺</span>身体变化</div>
+        <span class="accordion-arrow open">▾</span>
+      </div>
+      <div class="accordion-body">
+        <div class="symptom"><strong>腰背酸痛</strong> — 子宫增大导致重心前移，建议睡觉时左侧卧，垫腰枕</div>
+        <div class="symptom"><strong>乳房增大</strong> — 乳腺发育，孕激素升高，更换合适孕妇内衣</div>
+        <div class="symptom"><strong>偶尔头晕</strong> — 血容量增加、血压稍低，起身动作放慢</div>
+        <div class="symptom"><strong>皮肤变化</strong> — 腹部、乳房可能出现妊娠纹，及早使用橄榄油按摩</div>
+        <span style="font-weight:700;font-size:11px;color:#e53935;display:block;margin:8px 0 4px;">⚠️ 需警惕的信号</span>
+        <span class="warn-item">🚨 阴道出血超过月经量 → 立即就医</span>
+        <span class="warn-item">🚨 剧烈腹痛持续超过30分钟 → 立即就医</span>
+      </div>
+    </div>
+
+    <!-- Accordion: 心理变化 -->
+    <div class="accordion-item">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <div class="accordion-header-left"><span class="accordion-icon">💭</span>心理变化</div>
+        <span class="accordion-arrow">▾</span>
+      </div>
+      <div class="accordion-body" style="display:none;">
+        本周很多妈妈会开始感受到宝宝的真实存在感，可能伴随着小小的激动和不安。情绪波动是正常现象，孕激素水平变化会影响心情。建议每天留出10分钟做胎教，和宝宝说说话，这也是很好的减压方式～
+        <div style="margin-top:8px;padding:6px 10px;background:#f3e5f5;border-radius:8px;font-size:11px;color:#7b1fa2;">💜 给准爸爸：多关心妈妈的情绪变化，多一个拥抱，就是最好的支持</div>
+      </div>
+    </div>
+
+    <!-- Accordion: 营养提醒 -->
+    <div class="accordion-item">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <div class="accordion-header-left"><span class="accordion-icon">🥗</span>营养提醒</div>
+        <span class="accordion-arrow">▾</span>
+      </div>
+      <div class="accordion-body" style="display:none;">
+        <div style="font-size:11px;font-weight:700;color:#333;margin-bottom:8px;">本周重点：铁质 + DHA</div>
+        <div class="nutrition-item"><span class="nutrition-emoji">🥩</span><span class="nutrition-text">瘦肉红肉 — 血红素铁最易吸收</span></div>
+        <div class="nutrition-item"><span class="nutrition-emoji">🐟</span><span class="nutrition-text">深海鱼 — 补充DHA促进大脑发育</span></div>
+        <div class="nutrition-item"><span class="nutrition-emoji">🥬</span><span class="nutrition-text">深绿蔬菜 — 叶酸+铁双补</span></div>
+        <div class="nutrition-item"><span class="nutrition-emoji">🍊</span><span class="nutrition-text">维C水果 — 促进铁质吸收</span></div>
+        <div style="margin-top:8px;font-size:11px;color:#e53935;">❌ 忌：生鱼片、高汞鱼类（金枪鱼）、酒精</div>
+      </div>
+    </div>
+
+    <!-- Accordion: 如何安心度过这一周 -->
+    <div class="accordion-item">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <div class="accordion-header-left"><span class="accordion-icon">✅</span>如何安心度过这一周</div>
+        <span class="accordion-arrow">▾</span>
+      </div>
+      <div class="accordion-body" style="display:none;">
+        <div class="checklist-item">
+          <div class="check-box done">✓</div>
+          <div class="checklist-text">本周需预约唐筛，窗口期14~20周</div>
+          <div class="checklist-action">产检日历 ›</div>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <div class="checklist-text">记录今日体重（本周目标增重0.3~0.5kg）</div>
+          <div class="checklist-action">记录体重 ›</div>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <div class="checklist-text">量一次血压并记录</div>
+          <div class="checklist-action">记录血压 ›</div>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box done">✓</div>
+          <div class="checklist-text">尝试左侧卧睡，使用腰枕缓解腰背酸痛</div>
+        </div>
+        <div class="checklist-item" style="border:none;">
+          <div class="check-box"></div>
+          <div class="checklist-text">今天和准爸爸分享一件让你开心的事</div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-space"></div>
+
+    <!-- AI Float Button -->
+    <div class="ai-float-btn" onclick="location.href='mom-assistant.html'" style="position:fixed;right:28px;bottom:100px;width:48px;height:48px;background:linear-gradient(135deg,#f4b382,#e87c3e);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 14px rgba(232,124,62,0.4);cursor:pointer;z-index:999;">
+      🤖
+      <div style="position:absolute;top:-3px;right:-3px;width:12px;height:12px;background:#ff4444;border-radius:50%;border:2px solid #fff;"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ============ Page 3: 宝宝发育 Tab ============ -->
+<div>
+<div class="phone-label">P03 · 宝宝发育详情页（孕14周）</div>
+<div class="phone knowledge-page">
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+  </div>
+  <div class="screen">
+    <div class="page-nav">
+      <span class="back-btn" onclick="location.href='home-tab.html'" style="cursor:pointer;">‹</span>
+      <span class="page-nav-title">孕期知识</span>
+    </div>
+    <div class="week-tab-scroll">
+      <div class="week-chip">孕12周</div>
+      <div class="week-chip">孕13周</div>
+      <div class="week-chip active">孕14周</div>
+      <div class="week-chip">孕15周</div>
+      <div class="week-chip">孕16周</div>
+    </div>
+    <div class="content-tab-row">
+      <div class="content-tab">妈妈健康</div>
+      <div class="content-tab active">宝宝发育</div>
+    </div>
+    <div class="knowledge-hero" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);">
+      <div class="knowledge-hero-fig">👶</div>
+      <div class="knowledge-hero-text">
+        <h2 style="color:#1b5e20;">孕14周</h2>
+        <p style="color:#388e3c;">宝宝发育 · 本周情况</p>
+      </div>
+    </div>
+
+    <div class="baby-dev-section">
+      <div class="baby-dev-hero">
+        <div class="baby-dev-3d">👶</div>
+        <div class="baby-dev-info">
+          <h3>孕14周发育情况</h3>
+          <div class="size-row">
+            <span>身长：8.7cm</span>
+            <span>体重：43g</span>
+          </div>
+          <div class="fruit-compare">🍇 大小像一颗山竹</div>
+        </div>
+      </div>
+      <div class="baby-quote">
+        💬 妈妈，我现在有8.7cm啦，大概一颗山竹那么大！我的手指头和脚趾头都长出来了，我最近很喜欢伸懒腰，你感受到了吗？我还开始会做小表情了，会皱眉和微笑哦！
+      </div>
+    </div>
+
+    <div style="margin:8px 16px 0;background:#fff;border-radius:14px;padding:14px;box-shadow:0 1px 6px rgba(0,0,0,0.06);">
+      <div style="font-size:12px;font-weight:700;color:#333;margin-bottom:10px;">🔬 本周发育亮点</div>
+      <div class="highlight-item"><div class="highlight-dot"></div><span>开始会做各种小表情（皱眉/微笑）</span></div>
+      <div class="highlight-item"><div class="highlight-dot"></div><span>手指甲开始生长</span></div>
+      <div class="highlight-item"><div class="highlight-dot"></div><span>肝脏开始分泌胆汁</span></div>
+      <div class="highlight-item"><div class="highlight-dot"></div><span>小家伙的脖子更灵活了，能转头</span></div>
+      <div class="highlight-item"><div class="highlight-dot"></div><span>眼睛虽紧闭，但已能感受到光线</span></div>
+    </div>
+
+    <div style="margin:8px 16px 0;background:#fff;border-radius:14px;padding:14px;box-shadow:0 1px 6px rgba(0,0,0,0.06);">
+      <div style="font-size:12px;font-weight:700;color:#333;margin-bottom:10px;">📐 本周发育数据</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="background:#f5f9f5;border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-size:20px;font-weight:800;color:#1b5e20;">8.7</div>
+          <div style="font-size:10px;color:#888;">厘米（cm）</div>
+        </div>
+        <div style="background:#f5f9f5;border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-size:20px;font-weight:800;color:#1b5e20;">43</div>
+          <div style="font-size:10px;color:#888;">克（g）</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin:8px 16px 20px;background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border-radius:14px;padding:14px;">
+      <div style="font-size:12px;font-weight:700;color:#1b5e20;margin-bottom:8px;">🍎 水果对照</div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="font-size:48px;">🍇</div>
+        <div>
+          <div style="font-size:16px;font-weight:800;color:#1b5e20;">山竹</div>
+          <div style="font-size:11px;color:#388e3c;">参考身长约8.7cm，体重约43g</div>
+          <div style="font-size:10px;color:#555;margin-top:4px;">数据参考：Hadlock 1991</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ============ Page 4: Home with Bottom Sheet Modal ============ -->
+<div>
+<div class="phone-label">P04 · 妈妈变化弹窗（自动触发）</div>
+<div class="phone">
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+  </div>
+  <div class="screen" style="position:relative;">
+    <!-- Dimmed background -->
+    <div style="position:absolute;inset:0;background:rgba(0,0,0,0.4);z-index:10;"></div>
+    <!-- Same home content blurred -->
+    <div style="padding:20px;background:linear-gradient(135deg,#fdf0e0,#fde8cc);height:200px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#b8895a;">首页内容（已暗化）</div>
+
+    <!-- Bottom Sheet -->
+    <div style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;z-index:20;padding:20px;">
+      <div style="width:40px;height:4px;background:#e0d8d0;border-radius:2px;margin:0 auto 16px;"></div>
+      <div style="font-size:16px;font-weight:800;color:#333;margin-bottom:14px;text-align:center;">🤰 孕14周妈妈变化</div>
+      <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;">
+        <div style="width:80px;height:100px;background:linear-gradient(135deg,#fdf0e0,#fde8cc);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:44px;flex-shrink:0;">🤰</div>
+        <div style="font-size:12px;color:#555;line-height:1.8;">
+          进入孕中期第一周，早孕反应正在减轻，你会感到精力逐渐恢复。子宫已长到拳头大小，腰腹开始有轻微束紧感。<br><br>
+          本周宝宝快速生长，骨骼开始硬化，外生殖器已可通过B超辨认，你会开始感受到些许胎动的前兆。<br><br>
+          最重要的事：预约中期唐氏筛查！
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button style="flex:1;padding:12px;background:#f5f0ea;border:none;border-radius:14px;font-size:13px;font-weight:700;color:#888;cursor:pointer;">我知道了</button>
+        <button style="flex:1;padding:12px;background:linear-gradient(135deg,#f4b382,#e87c3e);border:none;border-radius:14px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;box-shadow:0 3px 12px rgba(232,124,62,0.35);">了解更多</button>
+      </div>
+    </div>
+
+    <!-- Tab Bar still visible -->
+    <div class="tab-bar" style="position:relative;z-index:30;">
+      <div class="tab-item active">
+        <div class="tab-icon">🏠</div>
+        <div class="tab-text" style="color:#e87c3e;">首页</div>
+      </div>
+      <div class="tab-item" onclick="location.href='mom-assistant.html'" style="cursor:pointer;">
+        <div class="tab-icon">🤖</div>
+        <div class="tab-text">MOM助手</div>
+      </div>
+      <div class="tab-item" onclick="location.href='my-profile.html'" style="cursor:pointer;">
+        <div class="tab-icon">👤</div>
+        <div class="tab-text">我的</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+function toggleText() {
+  const text = document.getElementById('babyText');
+  const btn = event.target;
+  if (text.classList.contains('collapsed')) {
+    text.classList.remove('collapsed');
+    btn.textContent = '收起 ‹';
+  } else {
+    text.classList.add('collapsed');
+    btn.textContent = '展开 ›';
+  }
+}
+function toggleAccordion(header) {
+  const body = header.nextElementSibling;
+  const arrow = header.querySelector('.accordion-arrow');
+  if (body.style.display === 'none') {
+    body.style.display = 'block';
+    arrow.classList.add('open');
+  } else {
+    body.style.display = 'none';
+    arrow.classList.remove('open');
+  }
+}
+</script>
+</body>
+</html>

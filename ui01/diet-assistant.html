@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>饮食健康助手 · MOM孕期助手</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue',sans-serif;background:#e8e0d8;color:#333;}
+  :root{--orange:#FF8C42;--green:#4CAF7D;--red:#E05252;--blue:#5B8BF5;--teal:#1DC8A0;--bg:#f5f1ec;--white:#fff;--card-r:16px;}
+
+  .demo{display:flex;gap:28px;padding:40px;background:#e8e0d8;min-height:100vh;align-items:flex-start;flex-wrap:wrap;}
+  .phone{width:375px;min-height:812px;background:var(--bg);border-radius:44px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.22);position:relative;flex-shrink:0;}
+  .phone-inner{width:375px;height:812px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;}
+  .phone-inner::-webkit-scrollbar{display:none;}
+  .label{font-size:13px;color:#888;text-align:center;margin-top:12px;font-weight:500;}
+
+  .status-bar{height:44px;background:var(--white);display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:100;}
+  .status-time{font-size:15px;font-weight:600;}
+  .status-icons{font-size:12px;}
+  .nav-bar{height:52px;background:var(--white);display:flex;align-items:center;padding:0 16px;border-bottom:1px solid #f0ebe4;gap:12px;position:sticky;top:44px;z-index:99;}
+  .nav-back{width:32px;height:32px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:16px;}
+  .nav-title{flex:1;font-size:17px;font-weight:600;color:#1a1a1a;text-align:center;}
+  .nav-right{font-size:13px;color:var(--teal);font-weight:500;}
+
+  /* ===== CHAT ===== */
+  .chat-area{padding:12px 16px;display:flex;flex-direction:column;gap:10px;}
+  .msg-row{display:flex;gap:8px;align-items:flex-end;}
+  .msg-row.user{flex-direction:row-reverse;}
+  .avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;}
+  .avatar-ai{background:linear-gradient(135deg,#1DC8A0,#4CAF7D);}
+  .avatar-user{background:var(--orange);}
+  .bubble{max-width:260px;padding:10px 13px;border-radius:16px;font-size:14px;line-height:1.6;position:relative;}
+  .bubble-ai{background:var(--white);color:#333;border-radius:16px 16px 16px 4px;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+  .bubble-user{background:var(--orange);color:var(--white);border-radius:16px 16px 4px 16px;}
+  .bubble-time{font-size:10px;color:#ccc;text-align:center;padding:4px 0;}
+
+  /* ===== FOOD RESULT CARD ===== */
+  .food-card{background:var(--white);border-radius:var(--card-r);overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);margin:4px 0;}
+  .food-img{width:100%;height:110px;background:linear-gradient(135deg,#f0f9f0,#e8f5e8);display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;}
+  .food-img-label{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.5);color:#fff;font-size:10px;padding:3px 8px;border-radius:10px;}
+  .food-header{padding:10px 12px 6px;font-size:13px;font-weight:600;color:#333;border-bottom:1px solid #f5f1ec;}
+  .food-list{padding:6px 12px;}
+  .food-item{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #fafaf8;font-size:13px;}
+  .food-item:last-child{border-bottom:none;}
+  .food-name{display:flex;align-items:center;gap:5px;color:#333;}
+  .food-kcal{color:#888;font-size:12px;}
+  .gi-badge{font-size:9px;padding:1px 5px;border-radius:6px;font-weight:600;}
+  .gi-low{background:#e8f5ee;color:var(--green);}
+  .gi-mid{background:#fff3eb;color:var(--orange);}
+  .gi-high{background:#fef0f0;color:var(--red);}
+  .food-total{background:#f9f5f0;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;}
+  .total-label{font-size:13px;color:#666;font-weight:500;}
+  .total-value{font-size:16px;font-weight:700;color:#1a1a1a;}
+  .macro-bar{padding:8px 12px;}
+  .macro-label{display:flex;justify-content:space-between;font-size:10px;color:#aaa;margin-bottom:3px;}
+  .macro-track{height:6px;border-radius:3px;background:#f0ebe4;overflow:hidden;display:flex;}
+  .macro-carb{background:#5B8BF5;}
+  .macro-fat{background:#9B6FD4;}
+  .macro-protein{background:#4CAF7D;}
+  .food-actions{display:flex;gap:8px;padding:10px 12px;}
+  .food-btn{flex:1;height:36px;border-radius:8px;border:none;font-size:12px;font-weight:500;cursor:pointer;}
+  .food-btn-outline{background:var(--bg);color:#666;}
+  .food-btn-primary{background:var(--teal);color:var(--white);}
+
+  /* ===== AI evaluation bubble ===== */
+  .eval-bubble{background:#f0faf5;border-left:3px solid var(--teal);border-radius:0 12px 12px 0;padding:10px 13px;font-size:12px;color:#2a6a50;line-height:1.7;margin:4px 0;}
+
+  /* ===== DAILY PROGRESS ===== */
+  .daily-card{background:var(--white);border-radius:var(--card-r);padding:12px 14px;margin:4px 0;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+  .daily-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .daily-title{font-size:13px;font-weight:600;color:#333;}
+  .daily-value{font-size:13px;color:var(--teal);font-weight:600;}
+  .daily-bar{height:8px;background:#f0ebe4;border-radius:4px;overflow:hidden;}
+  .daily-fill{height:100%;background:linear-gradient(90deg,var(--teal),#7dd4c0);border-radius:4px;}
+  .daily-sub{display:flex;justify-content:space-between;font-size:10px;color:#aaa;margin-top:4px;}
+  .meal-tags{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+  .meal-tag{padding:4px 10px;border-radius:12px;font-size:11px;cursor:pointer;}
+  .meal-tag-active{background:var(--teal);color:var(--white);}
+  .meal-tag-inactive{background:var(--bg);color:#888;}
+
+  /* ===== INPUT BAR ===== */
+  .input-bar{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--white);border-top:1px solid #f0ebe4;position:sticky;bottom:0;}
+  .input-box{flex:1;height:40px;border-radius:20px;border:1.5px solid #e0d8d0;padding:0 14px;font-size:14px;background:#fafaf8;outline:none;}
+  .input-icon-btn{width:40px;height:40px;border-radius:50%;background:var(--bg);border:none;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;flex-shrink:0;}
+  .send-btn{width:40px;height:40px;border-radius:50%;background:var(--teal);border:none;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--white);cursor:pointer;flex-shrink:0;}
+
+  /* ===== GOAL SETTING ===== */
+  .goal-section{background:var(--white);margin:12px 16px;border-radius:var(--card-r);padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+  .goal-title{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:14px;}
+  .goal-row{margin-bottom:16px;}
+  .goal-label{font-size:13px;color:#666;margin-bottom:6px;font-weight:500;display:flex;justify-content:space-between;}
+  .goal-value{font-size:12px;color:var(--teal);font-weight:600;}
+  .slider-wrap{position:relative;height:6px;background:#f0ebe4;border-radius:3px;margin-bottom:4px;}
+  .slider-fill{height:100%;background:var(--teal);border-radius:3px;}
+  .slider-knob{width:18px;height:18px;border-radius:50%;background:var(--teal);border:2px solid var(--white);box-shadow:0 2px 6px rgba(29,200,160,.4);position:absolute;top:50%;transform:translateY(-50%);cursor:pointer;}
+  .slider-labels{display:flex;justify-content:space-between;font-size:10px;color:#aaa;}
+  .radio-group{display:flex;gap:8px;flex-wrap:wrap;}
+  .radio-chip{padding:7px 14px;border-radius:20px;border:1.5px solid #e0d8d0;font-size:12px;color:#666;cursor:pointer;}
+  .radio-chip.active{background:var(--teal);border-color:var(--teal);color:var(--white);}
+  .info-box{background:#f0faf5;border-radius:10px;padding:10px 14px;margin-top:4px;font-size:12px;color:#2a6a50;line-height:1.6;}
+  .save-btn{width:100%;height:50px;border-radius:14px;background:var(--teal);border:none;color:var(--white);font-size:16px;font-weight:600;cursor:pointer;margin:4px 0;}
+
+  /* ===== ONBOARDING SURVEY ===== */
+  .survey-card{background:var(--white);border-radius:var(--card-r);padding:16px;margin:4px 0;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+  .survey-q{font-size:14px;font-weight:500;color:#1a1a1a;margin-bottom:10px;line-height:1.5;}
+  .survey-opts{display:flex;flex-direction:column;gap:8px;}
+  .survey-opt{padding:10px 14px;border-radius:10px;border:1.5px solid #e0d8d0;font-size:13px;color:#555;cursor:pointer;display:flex;align-items:center;gap:8px;}
+  .survey-opt.selected{border-color:var(--teal);background:#f0faf5;color:#1a8a6a;}
+  .survey-opt-key{width:20px;height:20px;border-radius:50%;background:var(--bg);font-size:11px;font-weight:600;color:#888;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .survey-opt.selected .survey-opt-key{background:var(--teal);color:var(--white);}
+</style>
+</head>
+<body>
+<div class="demo">
+
+  <!-- ============ P18-A: 饮食助手对话页（首次使用-需求问卷） ============ -->
+  <div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">📶 🔋</div>
+      </div>
+      <div class="nav-bar">
+        <div class="nav-back" onclick="location.href='mom-assistant.html'" style="cursor:pointer;">‹</div>
+        <div class="nav-title">饮食健康助手</div>
+        <div class="nav-right">目标设置</div>
+      </div>
+
+      <!-- 欢迎区 -->
+      <div style="background:linear-gradient(135deg,#f0faf5,#e8f9f2);padding:16px 20px;border-bottom:1px solid #d0f0e8;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--green));display:flex;align-items:center;justify-content:center;font-size:18px;">🥗</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:#1a6a50;">饮食健康助手</div>
+            <div style="font-size:11px;color:#4aaa80;">热量控制 · GI值 · 个性化方案</div>
+          </div>
+        </div>
+        <!-- 每日热量进度 -->
+        <div class="daily-card" style="margin:0;">
+          <div class="daily-header">
+            <div class="daily-title">今日热量摄入</div>
+            <div class="daily-value">856 / 1800 kcal</div>
+          </div>
+          <div class="daily-bar"><div class="daily-fill" style="width:47.6%"></div></div>
+          <div class="daily-sub">
+            <span>早餐 340kcal</span>
+            <span>午餐 516kcal</span>
+            <span>晚餐 0kcal</span>
+          </div>
+          <div class="meal-tags">
+            <div class="meal-tag meal-tag-active">🌅 早餐</div>
+            <div class="meal-tag meal-tag-active">☀️ 午餐</div>
+            <div class="meal-tag meal-tag-inactive">🌙 晚餐</div>
+            <div class="meal-tag meal-tag-inactive">🍎 加餐</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 对话区 -->
+      <div class="chat-area">
+        <div class="bubble-time">今天 9:41</div>
+
+        <!-- AI问卷 -->
+        <div class="msg-row">
+          <div class="avatar avatar-ai">🥗</div>
+          <div>
+            <div class="bubble bubble-ai">你好！在为你提供饮食建议前，我想先了解一下你的需求～<br><br>请问你使用饮食助手主要是为了：</div>
+            <div class="survey-card" style="margin-top:6px;max-width:260px;">
+              <div class="survey-opts">
+                <div class="survey-opt"><div class="survey-opt-key">A</div>控制孕期体重增长，避免长太快</div>
+                <div class="survey-opt selected"><div class="survey-opt-key">B</div>妊娠糖尿病饮食管理，控制血糖</div>
+                <div class="survey-opt"><div class="survey-opt-key">C</div>营养均衡，确保宝宝发育</div>
+                <div class="survey-opt"><div class="survey-opt-key">D</div>以上都有</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 用户选择 -->
+        <div class="msg-row user">
+          <div class="avatar avatar-user">👤</div>
+          <div class="bubble bubble-user">B · 妊娠糖尿病饮食管理</div>
+        </div>
+
+        <!-- AI追问 -->
+        <div class="msg-row">
+          <div class="avatar avatar-ai">🥗</div>
+          <div>
+            <div class="bubble bubble-ai">了解了～请问你目前有被诊断为妊娠期糖尿病（GDM）吗？</div>
+            <div class="survey-card" style="margin-top:6px;max-width:260px;">
+              <div class="survey-opts">
+                <div class="survey-opt selected"><div class="survey-opt-key">A</div>是，已确诊</div>
+                <div class="survey-opt"><div class="survey-opt-key">B</div>医生说要控制，还未正式确诊</div>
+                <div class="survey-opt"><div class="survey-opt-key">C</div>没有，只是想预防</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 用户回答 -->
+        <div class="msg-row user">
+          <div class="avatar avatar-user">👤</div>
+          <div class="bubble bubble-user">A · 是，已确诊GDM</div>
+        </div>
+
+        <!-- AI响应 -->
+        <div class="msg-row">
+          <div class="avatar avatar-ai">🥗</div>
+          <div>
+            <div class="bubble bubble-ai">收到！我已为你开启 <strong>GDM控糖模式</strong> 🍃<br><br>接下来我会：<br>· 重点标注每种食物的GI值<br>· 高GI食物红色提醒<br>· 每餐控制碳水 ≤45g<br>· 推荐低GI替代食物<br><br>现在可以拍照上传你的餐食，或者直接问我任何饮食问题～</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-bar">
+        <div class="input-icon-btn">🎤</div>
+        <input class="input-box" placeholder="描述你吃了什么，或拍照上传…">
+        <div class="input-icon-btn">📷</div>
+        <div class="send-btn">↑</div>
+      </div>
+    </div>
+  </div>
+  <div class="label">P18-A-1 · 饮食助手首次问卷</div>
+  </div>
+
+  <!-- ============ P18-A-2: 日常对话状态 ============ -->
+  <div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="status-bar">
+        <span class="status-time">12:38</span>
+        <div class="status-icons">📶 🔋</div>
+      </div>
+      <div class="nav-bar">
+        <div class="nav-back" onclick="location.href='mom-assistant.html'" style="cursor:pointer;">‹</div>
+        <div class="nav-title">饮食健康助手</div>
+        <div class="nav-right">目标设置</div>
+      </div>
+
+      <!-- 每日进度 -->
+      <div style="padding:12px 16px;background:var(--white);border-bottom:1px solid #f0ebe4;">
+        <div class="daily-card" style="margin:0;">
+          <div class="daily-header">
+            <div class="daily-title">今日热量 <span style="font-size:10px;color:#aaa;font-weight:400;">（GDM控糖模式）</span></div>
+            <div class="daily-value">856 / 1800 kcal</div>
+          </div>
+          <div class="daily-bar"><div class="daily-fill" style="width:47.6%"></div></div>
+          <div class="daily-sub">
+            <span>碳水 82g / 180g目标</span>
+            <span style="color:var(--teal);">✓ 达标</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-area">
+        <div class="bubble-time">12:32</div>
+
+        <!-- 用户发图 -->
+        <div class="msg-row user">
+          <div class="avatar avatar-user">👤</div>
+          <div>
+            <div style="width:140px;height:100px;border-radius:12px;background:linear-gradient(135deg,#f0f9f0,#d8f0e0);display:flex;align-items:center;justify-content:center;font-size:40px;border:1.5px solid #d0e8d0;cursor:pointer;">🍱</div>
+            <div style="font-size:10px;color:#ddd;margin-top:3px;text-align:right;">12:32</div>
+          </div>
+        </div>
+
+        <!-- AI识别中 -->
+        <div class="msg-row">
+          <div class="avatar avatar-ai">🥗</div>
+          <div class="bubble bubble-ai" style="color:#aaa;">正在识别你的午餐… 🔍</div>
+        </div>
+
+        <div class="bubble-time">12:33</div>
+
+        <!-- AI识别结果卡 -->
+        <div class="msg-row">
+          <div class="avatar avatar-ai">🥗</div>
+          <div style="max-width:285px;">
+            <div class="bubble bubble-ai" style="margin-bottom:6px;">已识别你的午餐，以下是营养分析：</div>
+            <div class="food-card">
+              <div class="food-img">
+                🍱
+                <div class="food-img-label">午餐识别</div>
+              </div>
+              <div class="food-header">已识别食物 · 午餐</div>
+              <div class="food-list">
+                <div class="food-item">
+                  <div class="food-name">🍳 煎蛋 <span style="color:#aaa;font-size:11px;">60g</span></div>
+                  <div style="display:flex;align-items:center;gap:5px;">
+                    <div class="gi-badge gi-low">低GI</div>
+                    <div class="food-kcal">98 kcal</div>
+                  </div>
+                </div>
+                <div class="food-item">
+                  <div class="food-name">🦐 白灼虾 <span style="color:#aaa;font-size:11px;">150g</span></div>
+                  <div style="display:flex;align-items:center;gap:5px;">
+                    <div class="gi-badge gi-low">低GI</div>
+                    <div class="food-kcal">161 kcal</div>
+                  </div>
+                </div>
+                <div class="food-item">
+                  <div class="food-name">🥦 西兰花 <span style="color:#aaa;font-size:11px;">100g</span></div>
+                  <div style="display:flex;align-items:center;gap:5px;">
+                    <div class="gi-badge gi-low">低GI</div>
+                    <div class="food-kcal">26 kcal</div>
+                  </div>
+                </div>
+                <div class="food-item" style="background:#fff8f0;margin:0 -12px;padding:7px 12px;border-radius:6px;">
+                  <div class="food-name">🍚 白米饭 <span style="color:#aaa;font-size:11px;">200g</span></div>
+                  <div style="display:flex;align-items:center;gap:5px;">
+                    <div class="gi-badge gi-high">高GI⚠</div>
+                    <div class="food-kcal">232 kcal</div>
+                  </div>
+                </div>
+              </div>
+              <div class="food-total">
+                <div class="total-label">本餐合计</div>
+                <div class="total-value">517 kcal</div>
+              </div>
+              <div class="macro-bar">
+                <div class="macro-label">
+                  <span style="color:#5B8BF5;">碳水 55%</span>
+                  <span style="color:#9B6FD4;">脂肪 20%</span>
+                  <span style="color:#4CAF7D;">蛋白质 25%</span>
+                </div>
+                <div class="macro-track">
+                  <div class="macro-carb" style="width:55%"></div>
+                  <div class="macro-fat" style="width:20%"></div>
+                  <div class="macro-protein" style="width:25%"></div>
+                </div>
+              </div>
+              <div class="food-actions">
+                <button class="food-btn food-btn-outline">饮食目标</button>
+                <button class="food-btn food-btn-primary">查看饮食建议</button>
+              </div>
+            </div>
+
+            <!-- AI建议 -->
+            <div class="eval-bubble" style="margin-top:6px;">
+              ⚠️ <strong>GDM控糖提醒：</strong>白米饭 GI值≈83，属于高GI食物，200g含碳水约45g，<strong>已达本餐碳水上限</strong>。<br><br>建议下次将白米饭换成 <strong>黑米饭或糙米</strong>（GI≈56），口感相近但血糖影响更小。本餐其余食物搭配很不错，蛋白质和蔬菜比例均衡 ✓
+            </div>
+          </div>
+        </div>
+
+        <!-- 用户追问 -->
+        <div class="msg-row user">
+          <div class="avatar avatar-user">👤</div>
+          <div class="bubble bubble-user">那我晚餐应该吃什么？</div>
+        </div>
+
+        <!-- AI回复 -->
+        <div class="msg-row">
+          <div class="avatar avatar-ai">🥗</div>
+          <div>
+            <div class="bubble bubble-ai">根据你今天已摄入的食物，晚餐建议：<br><br>还剩约 <strong>944 kcal</strong>，碳水剩余 <strong>~98g</strong><br><br>🌙 <strong>晚餐推荐方案：</strong><br>· 糙米饭 150g (中GI)<br>· 清蒸鱼 200g (低GI)<br>· 炒青菜 200g (低GI)<br>· 豆腐 100g (低GI)<br><br>合计约 <strong>480 kcal</strong>，碳水 45g ✓</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-bar">
+        <div class="input-icon-btn">🎤</div>
+        <input class="input-box" placeholder="继续提问或拍照上传餐食…">
+        <div class="input-icon-btn">📷</div>
+        <div class="send-btn">↑</div>
+      </div>
+    </div>
+  </div>
+  <div class="label">P18-A-2 · 饮食助手日常对话</div>
+  </div>
+
+  <!-- ============ P18-B: 食物识别结果页（全屏） ============ -->
+  <div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="status-bar">
+        <span class="status-time">12:33</span>
+        <div class="status-icons">📶 🔋</div>
+      </div>
+      <div class="nav-bar">
+        <div class="nav-back" onclick="location.href='mom-assistant.html'" style="cursor:pointer;">‹</div>
+        <div class="nav-title">识别结果</div>
+        <div class="nav-right" style="color:#aaa;">修改</div>
+      </div>
+
+      <!-- 图片预览 -->
+      <div style="width:100%;height:180px;background:linear-gradient(135deg,#f0f9f0,#d8f4e8);display:flex;align-items:center;justify-content:center;font-size:64px;position:relative;">
+        🍱
+        <div style="position:absolute;bottom:12px;left:12px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;padding:3px 10px;border-radius:10px;">午餐 · 12:30</div>
+        <div style="position:absolute;bottom:12px;right:12px;background:var(--teal);color:#fff;font-size:11px;padding:3px 10px;border-radius:10px;">识别完成 ✓</div>
+      </div>
+
+      <!-- 识别结果 -->
+      <div style="padding:14px 16px;">
+        <div style="font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:12px;">已识别食物</div>
+        <div style="background:var(--white);border-radius:var(--card-r);overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05);">
+          <div style="padding:10px 14px;background:#f0faf5;border-bottom:1px solid #d0f0e0;font-size:12px;color:#1a8a6a;">
+            🌿 GDM控糖模式已开启 · 高GI食物已高亮提醒
+          </div>
+          <div class="food-list" style="padding:0 14px;">
+            <div class="food-item">
+              <div class="food-name">🍳 煎蛋</div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="font-size:12px;color:#aaa;">60g</div>
+                <div class="gi-badge gi-low">低GI 15</div>
+                <div class="food-kcal" style="font-weight:600;">98 kcal</div>
+              </div>
+            </div>
+            <div class="food-item">
+              <div class="food-name">🦐 白灼虾</div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="font-size:12px;color:#aaa;">150g</div>
+                <div class="gi-badge gi-low">低GI 18</div>
+                <div class="food-kcal" style="font-weight:600;">161 kcal</div>
+              </div>
+            </div>
+            <div class="food-item">
+              <div class="food-name">🥦 西兰花</div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="font-size:12px;color:#aaa;">100g</div>
+                <div class="gi-badge gi-low">低GI 10</div>
+                <div class="food-kcal" style="font-weight:600;">26 kcal</div>
+              </div>
+            </div>
+            <div class="food-item" style="background:#fff8f0;margin:0 -14px;padding:10px 14px;">
+              <div class="food-name" style="flex:1;">
+                <div>
+                  <div style="display:flex;align-items:center;gap:5px;">🍚 白米饭 <span style="font-size:10px;padding:1px 5px;background:#fef0f0;color:var(--red);border-radius:4px;">建议替换</span></div>
+                  <div style="font-size:11px;color:#aaa;margin-top:1px;">点击修改克重</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="font-size:12px;color:var(--red);">200g</div>
+                <div class="gi-badge gi-high">高GI 83</div>
+                <div class="food-kcal" style="font-weight:600;color:var(--red);">232 kcal</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 替换建议 -->
+          <div style="padding:10px 14px;background:#fff8f0;border-top:1px solid #ffe8d0;">
+            <div style="font-size:12px;color:var(--orange);font-weight:500;margin-bottom:6px;">⚠️ 白米饭 高GI，建议低GI替换：</div>
+            <div style="display:flex;gap:8px;">
+              <div style="padding:5px 12px;border-radius:16px;border:1.5px solid #1DC8A0;font-size:12px;color:var(--teal);cursor:pointer;background:#f0faf5;">黑米饭 (GI56)</div>
+              <div style="padding:5px 12px;border-radius:16px;border:1.5px solid #1DC8A0;font-size:12px;color:var(--teal);cursor:pointer;background:#f0faf5;">糙米饭 (GI59)</div>
+              <div style="padding:5px 12px;border-radius:16px;border:1.5px solid #e0d8d0;font-size:12px;color:#888;cursor:pointer;">藜麦 (GI53)</div>
+            </div>
+          </div>
+
+          <!-- 总计 -->
+          <div class="food-total" style="flex-direction:column;gap:8px;align-items:flex-start;">
+            <div style="display:flex;justify-content:space-between;width:100%;">
+              <div class="total-label">本餐合计</div>
+              <div class="total-value">517 kcal</div>
+            </div>
+            <div style="width:100%;">
+              <div class="macro-label">
+                <span style="color:#5B8BF5;">碳水 55% (71g)</span>
+                <span style="color:#9B6FD4;">脂肪 20%</span>
+                <span style="color:#4CAF7D;">蛋白质 25%</span>
+              </div>
+              <div class="macro-track" style="height:8px;margin-top:4px;">
+                <div class="macro-carb" style="width:55%"></div>
+                <div class="macro-fat" style="width:20%"></div>
+                <div class="macro-protein" style="width:25%"></div>
+              </div>
+            </div>
+            <div style="background:#fff3eb;border-radius:6px;padding:6px 10px;width:100%;font-size:11px;color:var(--orange);">
+              ⚠️ 本餐碳水 71g，超出餐次上限 45g，建议减少白米饭用量
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 操作按钮 -->
+      <div style="padding:0 16px 16px;display:flex;gap:10px;">
+        <button style="flex:1;height:46px;border-radius:12px;background:#f0faf5;border:1.5px solid var(--teal);color:var(--teal);font-size:14px;font-weight:500;cursor:pointer;">查看饮食建议</button>
+        <button style="flex:1;height:46px;border-radius:12px;background:var(--teal);border:none;color:var(--white);font-size:14px;font-weight:600;cursor:pointer;">保存到饮食日志</button>
+      </div>
+    </div>
+  </div>
+  <div class="label">P18-B · 食物识别结果页</div>
+  </div>
+
+  <!-- ============ P18-C: 饮食目标设置页 ============ -->
+  <div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">📶 🔋</div>
+      </div>
+      <div class="nav-bar">
+        <div class="nav-back" onclick="location.href='mom-assistant.html'" style="cursor:pointer;">‹</div>
+        <div class="nav-title">饮食目标设置</div>
+        <div class="nav-right"></div>
+      </div>
+
+      <!-- 当前模式 -->
+      <div style="background:linear-gradient(135deg,#f0faf5,#e8f9f2);padding:14px 20px;border-bottom:1px solid #d0f0e0;display:flex;align-items:center;gap:10px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:16px;">🌿</div>
+        <div>
+          <div style="font-size:14px;font-weight:600;color:#1a6a50;">GDM控糖模式</div>
+          <div style="font-size:11px;color:#4aaa80;">优先低GI食物 · 单餐碳水 ≤45g</div>
+        </div>
+        <div style="margin-left:auto;font-size:12px;color:var(--teal);cursor:pointer;">切换模式</div>
+      </div>
+
+      <!-- 基础信息（只读） -->
+      <div class="goal-section">
+        <div class="goal-title">📊 基础数据（来自档案）</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div style="background:var(--bg);border-radius:10px;padding:10px;text-align:center;">
+            <div style="font-size:11px;color:#aaa;">孕前体重</div>
+            <div style="font-size:18px;font-weight:700;color:#333;">55 kg</div>
+          </div>
+          <div style="background:var(--bg);border-radius:10px;padding:10px;text-align:center;">
+            <div style="font-size:11px;color:#aaa;">孕前BMI</div>
+            <div style="font-size:18px;font-weight:700;color:#333;">20.2</div>
+          </div>
+          <div style="background:var(--bg);border-radius:10px;padding:10px;text-align:center;">
+            <div style="font-size:11px;color:#aaa;">当前孕周</div>
+            <div style="font-size:18px;font-weight:700;color:#333;">14周</div>
+          </div>
+          <div style="background:var(--bg);border-radius:10px;padding:10px;text-align:center;">
+            <div style="font-size:11px;color:#aaa;">孕期分类</div>
+            <div style="font-size:18px;font-weight:700;color:#333;">中期</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 热量目标 -->
+      <div class="goal-section">
+        <div class="goal-title">🔥 每日热量目标</div>
+        <div class="goal-row">
+          <div class="goal-label">总热量目标 <span class="goal-value">1800 kcal</span></div>
+          <div class="slider-wrap">
+            <div class="slider-fill" style="width:60%"></div>
+            <div class="slider-knob" style="left:60%"></div>
+          </div>
+          <div class="slider-labels"><span>1400 kcal</span><span>2200 kcal</span></div>
+        </div>
+        <div class="info-box">📌 系统推荐值：1800 kcal（基于孕前BMI 20.2 + 孕中期 +500kcal 标准，参考《中国居民膳食指南（孕期版）》）</div>
+      </div>
+
+      <!-- 餐次分配 -->
+      <div class="goal-section">
+        <div class="goal-title">🍽️ 每餐热量分配</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div>
+            <div class="goal-label" style="margin-bottom:4px;">早餐 <span style="color:var(--teal);">30% · 540 kcal</span></div>
+            <div style="height:6px;background:#f0ebe4;border-radius:3px;overflow:hidden;"><div style="height:100%;width:30%;background:var(--teal);border-radius:3px;"></div></div>
+          </div>
+          <div>
+            <div class="goal-label" style="margin-bottom:4px;">午餐 <span style="color:var(--teal);">40% · 720 kcal</span></div>
+            <div style="height:6px;background:#f0ebe4;border-radius:3px;overflow:hidden;"><div style="height:100%;width:40%;background:var(--teal);border-radius:3px;"></div></div>
+          </div>
+          <div>
+            <div class="goal-label" style="margin-bottom:4px;">晚餐 <span style="color:var(--teal);">30% · 540 kcal</span></div>
+            <div style="height:6px;background:#f0ebe4;border-radius:3px;overflow:hidden;"><div style="height:100%;width:30%;background:var(--teal);border-radius:3px;"></div></div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:12px;">
+          <div style="font-size:13px;color:#666;">启用加餐</div>
+          <div style="width:44px;height:24px;background:var(--teal);border-radius:12px;position:relative;cursor:pointer;"><div style="width:20px;height:20px;background:var(--white);border-radius:50%;position:absolute;top:2px;right:2px;box-shadow:0 1px 4px rgba(0,0,0,.2);"></div></div>
+          <div style="font-size:12px;color:#aaa;">每餐各分出10%至加餐</div>
+        </div>
+      </div>
+
+      <!-- GDM专项 -->
+      <div class="goal-section">
+        <div class="goal-title">🩸 GDM控糖目标</div>
+        <div class="goal-row">
+          <div class="goal-label">单餐碳水上限 <span class="goal-value">45 g</span></div>
+          <div class="slider-wrap">
+            <div class="slider-fill" style="width:45%"></div>
+            <div class="slider-knob" style="left:45%"></div>
+          </div>
+          <div class="slider-labels"><span>20g</span><span>80g</span></div>
+        </div>
+        <div class="goal-row">
+          <div class="goal-label">每日总碳水上限 <span class="goal-value">180 g</span></div>
+          <div class="slider-wrap">
+            <div class="slider-fill" style="width:50%"></div>
+            <div class="slider-knob" style="left:50%"></div>
+          </div>
+          <div class="slider-labels"><span>100g</span><span>260g</span></div>
+        </div>
+        <div class="info-box">📌 依据ADA妊娠糖尿病营养治疗建议，每日碳水供能比≤50%，单餐碳水≤45g</div>
+      </div>
+
+      <div style="padding:16px;">
+        <button class="save-btn">保存设置</button>
+      </div>
+    </div>
+  </div>
+  <div class="label">P18-C · 饮食目标设置页</div>
+  </div>
+
+</div>
+</body>
+</html>
